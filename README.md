@@ -11,24 +11,62 @@ Start off by forking this repository. In your README, write a design doc to outl
 #### Introduction
 - What motivates your project?
 
+I have an idea for a game that centers around procedural character creation and the idea of DNA. It wasn't inspired by Spore, but it does feel like a spiritual successor; I have some ideas for the game that I don't think were really possible back when Spore was released in 2008.
+
+Anyway, the full game idea is clearly out of scope, but it does motivate this project. In mathematics, when you want to solve a problem or prove a proof, you often start by solving a simpler, specific case of the problem. Doing so can reveal details or the right mindset for solving the more general problem. I think it could be a similarly useful exercise for me to implement a *specific* character generation tool, and see how what challenges I encounter and solutions I brew up.
+
 #### Goal
 - What do you intend to achieve with this project?
+
+In short: let's call it a procedural dragon generator.
+
+I want to use shape grammars to generate dragon meshses (and maybe do some procedural texturing if time permits).
+
+Unlike games such as Spore, however, where characters are crafted by users, piece-by-piece, I'd like to aim for a higher level of proceduralism. The user won't specify each piece and where it goes but, rather, the "DNA" for the dragon - aka, a grammar string that gets parsed by some set of rules I've created, and spits out a dragon. This extra layer of abstraction has the effect of creating emergent behavior; like Conway's game of life, the inputs are simple, but (hopefully) the outputs are complex.
 
 #### Inspiration/reference:
 - You must have some form of reference material for your final project. Your reference may be a research paper, a blog post, some artwork, a video, another class at Penn, etc.  
 - Include in your design doc links to and images of your reference material.
 
+- [No man's sky](https://www.youtube.com/watch?v=olU95U6-zQg)
+  - [And related article](https://medium.com/@jmohon1986/procedural-creature-generation-e476851adc32)
+- [Spore, naturally](https://boardgamegeek.com/blog/6866/blogpost/135068/how-the-spore-creature-creator-works#:~:text=In%20the%20Spore%20Creature%20editor,the%20creature%20fatter%20or%20thinner.)
+- [Procedural animation of worms/snake/fish/lizards](https://www.youtube.com/watch?v=qlfh_rv6khY)
+  - Perhaps not exactly relevant, but came up in my research and could be a fun way of extending this project in the future, if I want. Or could be an alternative, smaller scope version of the project.
+- [Random indie dev creature creator game](https://www.youtube.com/watch?v=Gn30PTq6bAs&t=183s)
+
 #### Specification:
-- Outline the main features of your project.
+Outline the main features of your project.
+
+(I'm not sure how much of this will actually be in scope yet; still need to discuss with TA/Profs. It's very possible the first bullet alone is already over-scoped)
+- Procedural dragon mesh creator (editable after generation via standard 3D modeling software)
+- Procedural scale texturer
+- Proceduarl animation (see video above in research above; I think this is actually pretty achievable)
+- Procedural fire-breath shader
 
 #### Techniques:
 - What are the main technical/algorithmic tools you’ll be using? Give an overview, citing specific papers/articles.
 
+Resources:
+- See references above, specifically the one on procedural animation.
+- Shape grammars class slides
+
 #### Design:
 - How will your program fit together? Make a simple free-body diagram illustrating the pieces.
 
+- Shape-grammar parser
+- Node-based grammar builder UI (like a mini-houdini for users to choose from grammar nodes and build / visualize the results)
+- Blender plugin to generate the mesh
+
+![Design flow chart](img/DesignFlowChart.png)
+
 #### Timeline:
 - Create a week-by-week set of milestones for each person in your group. Make sure you explicitly outline what each group member's duties will be.
+
+1. Write the grammar parser.
+1. Integrate with blender to generate simple meshes.
+1. Create rich rule set to generate dragon meshses.
+1. Create UI front end for easy grammar building.
 
 Submit your Design doc as usual via pull request against this repository.
 ## Milestone 1: Implementation part 1 (due 11/13)
