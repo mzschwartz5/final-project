@@ -4,6 +4,7 @@
 #include "stb_image.h"
 #include <iostream>
 #include "constants.h"
+#include "cube.h"
 
 // Forward declarations
 GLFWwindow* initializeGLFW();
@@ -17,6 +18,7 @@ int main() {
 		// GLFW initialization and global settings
 		GLFWwindow* window = initializeGLFW();
 		stbi_set_flip_vertically_on_load(true); // global setting for STB image loader
+        Cube cube;
 
 		// Main render loop
 		// Draw images until told to explicitly stop (e.g. x out of window)
@@ -25,7 +27,7 @@ int main() {
 			// Draw!
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+            cube.draw();
 			glfwSwapBuffers(window);
 			glfwPollEvents(); // updates window state upon events like keyboard or mouse inputs;
 		}
