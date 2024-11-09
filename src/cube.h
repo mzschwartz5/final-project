@@ -59,7 +59,7 @@ public:
     {
     }
 
-    void draw() const {
+    void draw() {
         m_mesh.Draw();
     }
 

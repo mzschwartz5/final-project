@@ -3,7 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
+#include "camera.h"
+#include "constants.h"
 
 Mesh::Mesh(vector<Vertex>&& vertices, vector<unsigned int>&& indices, Shader shader)
 	: m_vertices(std::move(vertices)), m_indices(std::move(indices)), m_shader(shader) {
@@ -11,8 +12,11 @@ Mesh::Mesh(vector<Vertex>&& vertices, vector<unsigned int>&& indices, Shader sha
 	setupMesh();
 }
 
-void Mesh::Draw() const {
+void Mesh::Draw() {
 	m_shader.use();
+	// TODO: getting the camera matrices probably shouldn't belong here. Or at least, it should be cached in the Camera class.
+	m_shader.setValue(Constants::VIEW_MATRIX, Camera::getInstance().calcViewMatrix());
+	m_shader.setValue(Constants::PROJECTION_MATRIX, Camera::getInstance().calcProjectionMatrix());
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0); // DRAW
 	glBindVertexArray(0); // unbind

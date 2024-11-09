@@ -9,7 +9,7 @@ using std::vector;
 class Mesh {
 public:
 	Mesh(vector<Vertex>&& vertices, vector<unsigned int>&& indices, Shader shader);
-	void Draw() const;
+	void Draw();
 private:
 	// Mesh data
 	vector<Vertex> m_vertices;
