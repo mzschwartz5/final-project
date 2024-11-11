@@ -5,10 +5,12 @@
 #include <iostream>
 #include "constants.h"
 #include "cube.h"
+#include "camera.h"
 
 // Forward declarations
 GLFWwindow* initializeGLFW();
 void glfwErrorCallback(int error, const char* description);
+void bindMouseInputsToWindow(GLFWwindow* window);
 
 int main() {
     // Top level error handling
@@ -17,6 +19,7 @@ int main() {
 
 		// GLFW initialization and global settings
 		GLFWwindow* window = initializeGLFW();
+		bindMouseInputsToWindow(window);
 		stbi_set_flip_vertically_on_load(true); // global setting for STB image loader
         Cube cube;
 
@@ -84,4 +87,40 @@ GLFWwindow* initializeGLFW() {
 
 void glfwErrorCallback(int error, const char* description) {
     std::cerr << "GLFW Error (" << error << "): " << description << std::endl;
+}
+
+
+void bindMouseInputsToWindow(GLFWwindow* window) {
+	// Lambda for mouse input callback
+	auto mouseCallback = [](GLFWwindow* window, double xpos, double ypos) {
+		static double lastX{ xpos };
+		static double lastY{ ypos };
+
+		double xoffset = xpos - lastX;
+		double yoffset = lastY - ypos;
+		lastX = xpos;
+		lastY = ypos;
+
+		Camera::getInstance().setCameraFront(xoffset, yoffset);
+	};
+	glfwSetCursorPosCallback(window, mouseCallback); // register callback
+
+	// Call the lambda once to initialize the static camera pointer, so we can unbind it at the end of this function.
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+	mouseCallback(window, xpos, ypos);
+
+	// Lambda for scroll input callback
+	auto scrollCallback = [](GLFWwindow* window, double xoffset, double yoffset) {
+		float sensitivty = 1.5f;
+
+		float fov = Camera::getInstance().getFov();
+		fov -= (float)(yoffset * sensitivty);
+		Camera::getInstance().setFov(fov);
+	};
+	glfwSetScrollCallback(window, scrollCallback); // register callback
+	scrollCallback(window, 0.0, 0.0); // call once to initialize the static camera pointer, so we can then clear it.
+
+	// Unbind GLFW user pointer
+	glfwSetWindowUserPointer(window, nullptr);
 }
