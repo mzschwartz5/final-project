@@ -1,17 +1,12 @@
 #ifndef NODE_H
 #define NODE_H
-
-// Forward declare Interpreter
-class Interpreter;
+#include "../interpreter.h"
 
 // Abstract base class for a command node
 class Node {
 public:
     virtual ~Node() = default;
-    virtual void evaluate() = 0;
-
-protected:
-    static Interpreter& interpreter;
+    virtual void evaluate(Interpreter& interpreter) = 0;
 };
 
 #endif

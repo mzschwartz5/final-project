@@ -1,5 +1,5 @@
 #include "numbernode.h"
 
-void NumberNode::evaluate() {
-    // Do nothing
+void NumberNode::evaluate(Interpreter& interpreter) {
+    interpreter.push(value);
 }

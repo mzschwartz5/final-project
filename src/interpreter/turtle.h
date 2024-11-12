@@ -17,6 +17,11 @@ public:
         mesh.setDrawMode(GL_LINES);
         positionIndex = mesh.addVertex(Vertex(vec3(0.0f, 0.0f, 0.5f), vec3(0.0f, 0.0f, 0.0f), vec2(0.0f, 0.0f)));
     }
+
+    ~Turtle() {
+        _instantiated = false;
+    }
+
     const vec3& getPosition() const { return position; }
     void setPosition(const vec3& pos, bool draw = true);
     void draw();

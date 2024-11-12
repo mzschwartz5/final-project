@@ -5,7 +5,7 @@
 class NumberNode : public Node {
 public:
     NumberNode(float value) : value(value) {}
-    void evaluate() override;
+    void evaluate(Interpreter& interpreter) override;
 
 private:
     float value;

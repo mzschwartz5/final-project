@@ -3,28 +3,39 @@
 
 #include <glm/glm.hpp>
 #include "macros.h"
-#include "nodes/node.h"
+#include "turtle.h"
+#include "macros.h"
+#include <list>
+using std::list;
+
+// Forward declare Node
+class Node;
 
 // VM to execute geometry skeleton generation commands
 class Interpreter {
 
 public:
-    // Singleton for now. TODO: consider using service locator pattern.
-    static Interpreter& get() {
-        static Interpreter instance;
-        return instance;
+    // Note: single instance, but not a full-fledged singleton (no global access)
+    Interpreter(Turtle& turtle) : turtle(turtle) {
+        assert(!_instantiated);
+        _instantiated = true;
     }
-    ~Interpreter() = default;
 
-    void run();
-    void push(uPtr<Node> node);
-    uPtr<Node> pop();
+    ~Interpreter() {
+        _instantiated = false;
+    }
+
+    void run(list<uPtr<Node>>& nodeList);
+    void push(float value);
+    float pop();
+    Turtle& getTurtle() { return turtle; }
 
 private:
-    Interpreter() {};
+    static bool _instantiated;
     static const int MAX_STACK_SIZE = 1000;
     int stackSize = 0;
-    uPtr<Node> stack[MAX_STACK_SIZE];
+    float stack[MAX_STACK_SIZE];
+    Turtle& turtle;
 };
 
 #endif

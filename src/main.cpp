@@ -3,9 +3,14 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <iostream>
+#include <macros.h>
 #include "constants.h"
 #include "camera.h"
 #include "interpreter/turtle.h"
+#include "interpreter/interpreter.h"
+#include "interpreter/nodes/movenode.h"
+#include "interpreter/nodes/numbernode.h"
+#include <list>
 
 // Forward declarations
 GLFWwindow* initializeGLFW();
@@ -22,9 +27,13 @@ int main() {
 		bindMouseInputsToWindow(window);
 		stbi_set_flip_vertically_on_load(true); // global setting for STB image loader
 
-		// TODO: turtle should have an interpreter that processes commands.
 		Turtle turtle;
-		turtle.setPosition(glm::vec3(0.0f, 0.5f, 0.5f), true);
+		Interpreter interpreter(turtle);
+		std::list<uPtr<Node>> nodeList;
+		nodeList.push_back(mkU<NumberNode>(0.5f));
+		nodeList.push_back(mkU<MoveNode>());
+
+		interpreter.run(nodeList);
 
 		// Main render loop
 		// Draw images until told to explicitly stop (e.g. x out of window)

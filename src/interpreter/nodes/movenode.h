@@ -5,7 +5,7 @@
 class MoveNode : public Node {
 public:
     MoveNode() {}
-    void evaluate() override;
+    void evaluate(Interpreter& interpreter) override;
 };
 
 #endif

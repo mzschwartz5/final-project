@@ -1,17 +1,20 @@
 #include "interpreter.h"
+#include "nodes/node.h"
 
-void Interpreter::run() {
-    while (stackSize > 0) {
-        pop()->evaluate();
+bool Interpreter::_instantiated = false;
+
+void Interpreter::run(list<uPtr<Node>>& nodeList) {
+    for (auto& node : nodeList) {
+        node->evaluate(*this);
     }
 }
 
-void Interpreter::push(uPtr<Node> node) {
+void Interpreter::push(float value) {
     assert(stackSize < MAX_STACK_SIZE);
-    stack[stackSize++] = std::move(node);
+    stack[stackSize++] = value;
 }
 
-uPtr<Node> Interpreter::pop() {
+float Interpreter::pop() {
     assert(stackSize > 0);
-    return std::move(stack[--stackSize]);
+    return stack[--stackSize];
 }
