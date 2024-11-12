@@ -17,9 +17,10 @@ void Turtle::move(float distance, bool draw) {
 }
 
 void Turtle::setPosition(const vec3& pos, bool draw) {
+    position = pos;
+
     if (!draw) return;
 
-    position = pos;
     uint vertIndex = mesh.addVertex(
         Vertex(
             pos,

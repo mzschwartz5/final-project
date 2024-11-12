@@ -24,11 +24,16 @@ public:
 
     void move(float distance, bool draw = true);
     void rotate(float yaw, float pitch);
+    void setPosition(const vec3& pos, bool draw = true);
     const vec3& getPosition() const { return position; }
+    void setRotation(float yaw, float pitch) { this->yaw = yaw; this->pitch = pitch; }
+    float getYaw() const { return yaw; }
+    float getPitch() const { return pitch; }
+    uint getPositionIndex() const { return positionIndex; }
+    void setPositionIndex(uint index) { positionIndex = index; }
     void draw();
 
 private:
-    void setPosition(const vec3& pos, bool draw = true);
     static bool _instantiated;
     vec3 position = vec3(0.0f, 0.0f, 0.0f);
     float pitch = 0.0f; // radians

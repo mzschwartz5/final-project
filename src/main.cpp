@@ -10,6 +10,9 @@
 #include "interpreter/interpreter.h"
 #include "interpreter/nodes/movenode.h"
 #include "interpreter/nodes/numbernode.h"
+#include "interpreter/nodes/yawnode.h"
+#include "interpreter/nodes/storetransformnode.h"
+#include "interpreter/nodes/restoretransformnode.h"
 #include <list>
 
 // Forward declarations
@@ -30,8 +33,56 @@ int main() {
 		Turtle turtle;
 		Interpreter interpreter(turtle);
 		std::list<uPtr<Node>> nodeList;
-		nodeList.push_back(mkU<NumberNode>(0.5f));
+		nodeList.push_back(mkU<StoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(5.0f));
 		nodeList.push_back(mkU<MoveNode>());
+		nodeList.push_back(mkU<RestoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
+		nodeList.push_back(mkU<YawNode>());
+		nodeList.push_back(mkU<StoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<MoveNode>());
+		nodeList.push_back(mkU<RestoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
+		nodeList.push_back(mkU<YawNode>());
+		nodeList.push_back(mkU<StoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<MoveNode>());
+		nodeList.push_back(mkU<RestoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
+		nodeList.push_back(mkU<YawNode>());
+		nodeList.push_back(mkU<StoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<MoveNode>());
+		nodeList.push_back(mkU<RestoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
+		nodeList.push_back(mkU<YawNode>());
+		nodeList.push_back(mkU<StoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<MoveNode>());
+		nodeList.push_back(mkU<RestoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
+		nodeList.push_back(mkU<YawNode>());
+		nodeList.push_back(mkU<StoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<MoveNode>());
+		nodeList.push_back(mkU<RestoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
+		nodeList.push_back(mkU<YawNode>());
+		nodeList.push_back(mkU<StoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<MoveNode>());
+		nodeList.push_back(mkU<RestoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
+		nodeList.push_back(mkU<YawNode>());
+		nodeList.push_back(mkU<StoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<MoveNode>());
+		nodeList.push_back(mkU<RestoreTransformNode>());
+		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
+		nodeList.push_back(mkU<YawNode>());
+
+
 
 		interpreter.run(nodeList);
 
