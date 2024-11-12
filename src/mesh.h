@@ -5,12 +5,23 @@
 #include "vertex.h"
 #include <vector>
 using std::vector;
+#include <glad/gl.h>
 
 class Mesh {
 public:
+	Mesh(Shader shader);
 	Mesh(vector<Vertex>&& vertices, vector<unsigned int>&& indices, Shader shader);
-	void Draw();
+	uint addVertex(Vertex&& vertex);
+	void addIndex(uint index);
+	void setupMesh();
+	void setDrawMode(GLenum mode) { drawMode = mode; }
+	void draw();
+
 private:
+	void bufferData();
+
+	bool dirty = false;
+
 	// Mesh data
 	vector<Vertex> m_vertices;
 	vector<unsigned int> m_indices;
@@ -18,7 +29,7 @@ private:
 
 	// Render data (OpenGL objects)
 	unsigned int VAO, VBO, EBO;
-	void setupMesh();
+	GLenum drawMode = GL_TRIANGLES;
 };
 
 #endif

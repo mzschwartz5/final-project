@@ -4,8 +4,8 @@
 #include "stb_image.h"
 #include <iostream>
 #include "constants.h"
-#include "cube.h"
 #include "camera.h"
+#include "interpreter/turtle.h"
 
 // Forward declarations
 GLFWwindow* initializeGLFW();
@@ -21,7 +21,10 @@ int main() {
 		GLFWwindow* window = initializeGLFW();
 		bindMouseInputsToWindow(window);
 		stbi_set_flip_vertically_on_load(true); // global setting for STB image loader
-        Cube cube;
+
+		// TODO: turtle should have an interpreter that processes commands.
+		Turtle turtle;
+		turtle.setPosition(glm::vec3(0.0f, 0.5f, 0.5f), true);
 
 		// Main render loop
 		// Draw images until told to explicitly stop (e.g. x out of window)
@@ -29,7 +32,7 @@ int main() {
 		{
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            cube.draw();
+			turtle.draw();
 			glfwSwapBuffers(window);
 			glfwPollEvents(); // updates window state upon events like keyboard or mouse inputs;
 		}
@@ -89,12 +92,18 @@ void glfwErrorCallback(int error, const char* description) {
     std::cerr << "GLFW Error (" << error << "): " << description << std::endl;
 }
 
-
 void bindMouseInputsToWindow(GLFWwindow* window) {
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	// Lambda for mouse input callback
 	auto mouseCallback = [](GLFWwindow* window, double xpos, double ypos) {
 		static double lastX{ xpos };
 		static double lastY{ ypos };
+
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS) {
+			lastX = xpos;
+			lastY = ypos;
+			return;
+		}
 
 		double xoffset = xpos - lastX;
 		double yoffset = lastY - ypos;

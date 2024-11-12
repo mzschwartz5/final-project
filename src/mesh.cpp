@@ -1,5 +1,4 @@
 #include "mesh.h"
-#include <glad/gl.h> 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -10,17 +9,38 @@ Mesh::Mesh(vector<Vertex>&& vertices, vector<unsigned int>&& indices, Shader sha
 	: m_vertices(std::move(vertices)), m_indices(std::move(indices)), m_shader(shader) {
 
 	setupMesh();
+	bufferData();
 }
 
-void Mesh::Draw() {
+Mesh::Mesh(Shader shader) : m_shader(shader) {
+	setupMesh();
+}
+
+void Mesh::draw() {
+	if (dirty) {
+		bufferData();
+		dirty = false;
+	}
+
 	m_shader.use();
 	// TODO: getting the camera matrices probably shouldn't belong here. Or at least, it should be cached in the Camera class.
 	m_shader.setValue(Constants::VIEW_MATRIX, Camera::getInstance().calcViewMatrix());
 	m_shader.setValue(Constants::PROJECTION_MATRIX, Camera::getInstance().calcProjectionMatrix());
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0); // DRAW
+	glDrawElements(drawMode, m_indices.size(), GL_UNSIGNED_INT, 0); // DRAW
 	glBindVertexArray(0); // unbind
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind
+}
+
+uint Mesh::addVertex(Vertex&& vertex) {
+	m_vertices.push_back(vertex);
+	dirty = true;
+	return m_vertices.size() - 1;
+}
+
+void Mesh::addIndex(uint index) {
+	m_indices.push_back(index);
+	dirty = true;
 }
 
 void Mesh::setupMesh() {
@@ -30,13 +50,9 @@ void Mesh::setupMesh() {
 	glGenBuffers(1, &EBO);		// (EBO stores vertex indices)
 
 	// Bind to OpenGL state so we can use them
-	glBindVertexArray(VAO); 
+	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-	// Set data to now-bound arrays
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), m_vertices.data(), GL_STATIC_DRAW); // sets to VBO
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), m_indices.data(), GL_STATIC_DRAW); // sets to EBO
 
 	// Dictate how to interpret vertex data (which attributes are where, in the array)
 	// Vertex positions
@@ -51,4 +67,12 @@ void Mesh::setupMesh() {
 
 	// Unbind VAO until use
 	glBindVertexArray(0);
-}	
+}
+
+void Mesh::bufferData() {
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), m_vertices.data(), GL_STATIC_DRAW); // sets to VBO
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), m_indices.data(), GL_STATIC_DRAW); // sets to EBO
+}

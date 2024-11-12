@@ -60,7 +60,7 @@ public:
     }
 
     void draw() {
-        m_mesh.Draw();
+        m_mesh.draw();
     }
 
 private:
