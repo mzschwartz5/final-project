@@ -22,13 +22,17 @@ public:
         _instantiated = false;
     }
 
+    void move(float distance, bool draw = true);
+    void rotate(float yaw, float pitch);
     const vec3& getPosition() const { return position; }
-    void setPosition(const vec3& pos, bool draw = true);
     void draw();
 
 private:
+    void setPosition(const vec3& pos, bool draw = true);
     static bool _instantiated;
     vec3 position = vec3(0.0f, 0.0f, 0.0f);
+    float pitch = 0.0f; // radians
+    float yaw = 0.0f;   // radians
     unsigned int positionIndex;
     Mesh mesh;
 };

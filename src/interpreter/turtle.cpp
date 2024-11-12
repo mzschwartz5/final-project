@@ -1,6 +1,21 @@
 #include "turtle.h"
 bool Turtle::_instantiated = false;
 
+void Turtle::rotate(float yaw, float pitch) {
+    this->yaw += yaw;
+    this->pitch += pitch;
+}
+
+void Turtle::move(float distance, bool draw) {
+    vec3 newPos = position + vec3(
+        distance * cos(yaw) * cos(pitch),
+        distance * sin(yaw) * cos(pitch),
+        distance * sin(pitch)
+    );
+
+    setPosition(newPos, draw);
+}
+
 void Turtle::setPosition(const vec3& pos, bool draw) {
     if (!draw) return;
 
