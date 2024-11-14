@@ -19,13 +19,13 @@
 struct MouseCallbackContext {
 	Camera* cameraLeft;
 	Camera* cameraRight;
-	float windowSplitRatio;
+	float& windowSplitRatio;
+	GLFWcursor* resizeCursor;
 };
 
 GLFWwindow* initializeGLFW();
 void glfwErrorCallback(int error, const char* description);
 void bindMouseInputsToWindow(GLFWwindow* window, MouseCallbackContext data);
-void renderSplitWindow(GLFWwindow* window, float splitRatio);
 
 int main() {
     // Top level error handling
@@ -37,7 +37,8 @@ int main() {
 		float windowSplitRatio = 0.5f;
 		Camera cameraLeft;
 		Camera cameraRight;
-		bindMouseInputsToWindow(window, { &cameraLeft, &cameraRight, windowSplitRatio });
+		GLFWcursor* resizeCursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+		bindMouseInputsToWindow(window, { &cameraLeft, &cameraRight, windowSplitRatio, resizeCursor});
 		stbi_set_flip_vertically_on_load(true); // global setting for STB image loader
 
 		Turtle turtle;
@@ -106,6 +107,15 @@ int main() {
 			// Render right viewport
 			glViewport(windowSplitRatio * Constants::SCR_WIDTH, 0, (1.0f - windowSplitRatio) * Constants::SCR_WIDTH, Constants::SCR_HEIGHT);
 			turtle.draw(cameraRight.calcViewMatrix(), cameraRight.calcProjectionMatrix(Constants::SCR_WIDTH * (1.0f - windowSplitRatio), Constants::SCR_HEIGHT));
+
+			// Render a border bar between the two viewports using glScissor
+			glViewport(0, 0, Constants::SCR_WIDTH, Constants::SCR_HEIGHT);
+			glEnable(GL_SCISSOR_TEST);
+			glScissor(windowSplitRatio * Constants::SCR_WIDTH - Constants::VIEWPORT_BORDER_WIDTH / 2, 0, Constants::VIEWPORT_BORDER_WIDTH, Constants::SCR_HEIGHT);
+			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			glDisable(GL_SCISSOR_TEST);
+
 			glfwSwapBuffers(window);
 			glfwPollEvents(); // updates window state upon events like keyboard or mouse inputs;
 		}
@@ -171,19 +181,35 @@ void bindMouseInputsToWindow(GLFWwindow* window, MouseCallbackContext data) {
 		no longer decays to a function pointer. Instead, we have to use GLFW functions to store off and retrieve the data.
 	*/
 	glfwSetWindowUserPointer(window, &data);
+
 	// Lambda for mouse input callback
+	// TODO - refactor this logic to be more readable
 	auto mouseCallback = [](GLFWwindow* window, double xpos, double ypos) {
 		static double lastX{ xpos };
 		static double lastY{ ypos };
 		static Camera* currentCamera{ nullptr };
+		static bool resizingViewports{ false };
 
 		// Retrieve pointer to camera from GLFW and call method to set the camera front vector
 		static MouseCallbackContext* context = static_cast<MouseCallbackContext*>(glfwGetWindowUserPointer(window));
+
+		double cursorXPos, cursorYPos;
+		glfwGetCursorPos(window, &cursorXPos, &cursorYPos);
+
+		if ((cursorXPos > context->windowSplitRatio * Constants::SCR_WIDTH - Constants::VIEWPORT_BORDER_WIDTH / 2 &&
+			cursorXPos < context->windowSplitRatio * Constants::SCR_WIDTH + Constants::VIEWPORT_BORDER_WIDTH / 2) ||
+			resizingViewports) {
+			glfwSetCursor(window, context->resizeCursor);
+		}
+		else {
+			glfwSetCursor(window, NULL);
+		}
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS) {
 			lastX = xpos;
 			lastY = ypos;
 			currentCamera = nullptr;
+			resizingViewports = false;
 			return;
 		}
 
@@ -192,8 +218,14 @@ void bindMouseInputsToWindow(GLFWwindow* window, MouseCallbackContext data) {
 		lastX = xpos;
 		lastY = ypos;
 
-		double cursorXPos, cursorYPos;
-		glfwGetCursorPos(window, &cursorXPos, &cursorYPos);
+		// Mouse is in the border bar between the two viewports
+		if ((cursorXPos > context->windowSplitRatio * Constants::SCR_WIDTH - Constants::VIEWPORT_BORDER_WIDTH / 2 &&
+			cursorXPos < context->windowSplitRatio * Constants::SCR_WIDTH + Constants::VIEWPORT_BORDER_WIDTH / 2) ||
+			resizingViewports) {
+			context->windowSplitRatio = glm::clamp((float)cursorXPos / Constants::SCR_WIDTH, 0.1f, 0.9f);
+			resizingViewports = true;
+			return;
+		}
 
 		if (!currentCamera && cursorXPos < Constants::SCR_WIDTH * context->windowSplitRatio) {
 			currentCamera = context->cameraLeft;
