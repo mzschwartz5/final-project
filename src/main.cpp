@@ -112,7 +112,7 @@ int main() {
 			glViewport(0, 0, Constants::SCR_WIDTH, Constants::SCR_HEIGHT);
 			glEnable(GL_SCISSOR_TEST);
 			glScissor(windowSplitRatio * Constants::SCR_WIDTH - Constants::VIEWPORT_BORDER_WIDTH / 2, 0, Constants::VIEWPORT_BORDER_WIDTH, Constants::SCR_HEIGHT);
-			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			glDisable(GL_SCISSOR_TEST);
 
