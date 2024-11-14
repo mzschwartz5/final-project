@@ -34,7 +34,3 @@ void Turtle::setPosition(const vec3& pos, bool draw) {
 
     positionIndex = vertIndex;
 }
-
-void Turtle::draw() {
-    mesh.draw();
-}

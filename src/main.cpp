@@ -18,7 +18,8 @@
 // Forward declarations
 GLFWwindow* initializeGLFW();
 void glfwErrorCallback(int error, const char* description);
-void bindMouseInputsToWindow(GLFWwindow* window);
+void bindMouseInputsToWindow(GLFWwindow* window, Camera& camera);
+void renderSplitWindow(GLFWwindow* window, float splitRatio);
 
 int main() {
     // Top level error handling
@@ -27,7 +28,8 @@ int main() {
 
 		// GLFW initialization and global settings
 		GLFWwindow* window = initializeGLFW();
-		bindMouseInputsToWindow(window);
+		Camera camera;
+		bindMouseInputsToWindow(window, camera);
 		stbi_set_flip_vertically_on_load(true); // global setting for STB image loader
 
 		Turtle turtle;
@@ -82,8 +84,6 @@ int main() {
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 
-
-
 		interpreter.run(nodeList);
 
 		// Main render loop
@@ -92,7 +92,8 @@ int main() {
 		{
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			turtle.draw();
+			// renderSplitWindow(window, 0.5);
+			turtle.draw(camera.calcViewMatrix(), camera.calcProjectionMatrix());
 			glfwSwapBuffers(window);
 			glfwPollEvents(); // updates window state upon events like keyboard or mouse inputs;
 		}
@@ -152,7 +153,12 @@ void glfwErrorCallback(int error, const char* description) {
     std::cerr << "GLFW Error (" << error << "): " << description << std::endl;
 }
 
-void bindMouseInputsToWindow(GLFWwindow* window) {
+void bindMouseInputsToWindow(GLFWwindow* window, Camera& camera) {
+	/*
+		NOTE: GLFW callbacks must be function pointers. This is annoying because the callbacks need access to camera. By passing in camera to the lambda's capture, the lambda
+		no longer decays to a function pointer. Instead, we have to use GLFW functions to store off and retrieve the camera pointer. (Which causes other annoyances and oddities..)
+	*/
+	glfwSetWindowUserPointer(window, &camera);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	// Lambda for mouse input callback
 	auto mouseCallback = [](GLFWwindow* window, double xpos, double ypos) {
@@ -170,7 +176,9 @@ void bindMouseInputsToWindow(GLFWwindow* window) {
 		lastX = xpos;
 		lastY = ypos;
 
-		Camera::getInstance().setCameraFront(xoffset, yoffset);
+		// Retrieve pointer to camera from GLFW and call method to set the camera front vector
+		static Camera* pCamera = static_cast<Camera*>(glfwGetWindowUserPointer(window));
+		pCamera->setCameraFront(xoffset, yoffset);
 	};
 	glfwSetCursorPosCallback(window, mouseCallback); // register callback
 
@@ -182,10 +190,11 @@ void bindMouseInputsToWindow(GLFWwindow* window) {
 	// Lambda for scroll input callback
 	auto scrollCallback = [](GLFWwindow* window, double xoffset, double yoffset) {
 		float sensitivty = 1.5f;
+		static Camera* pCamera = static_cast<Camera*>(glfwGetWindowUserPointer(window));
 
-		float fov = Camera::getInstance().getFov();
+		float fov = pCamera->getFov();
 		fov -= (float)(yoffset * sensitivty);
-		Camera::getInstance().setFov(fov);
+		pCamera->setFov(fov);
 	};
 	glfwSetScrollCallback(window, scrollCallback); // register callback
 	scrollCallback(window, 0.0, 0.0); // call once to initialize the static camera pointer, so we can then clear it.
@@ -193,3 +202,18 @@ void bindMouseInputsToWindow(GLFWwindow* window) {
 	// Unbind GLFW user pointer
 	glfwSetWindowUserPointer(window, nullptr);
 }
+
+// void renderPane(GLFWwindow* window, float width, float height, float offset) {
+// 	int screenWidth, screenHeight;
+// 	glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
+
+//     // Render left pane
+//     glViewport(0, 0, splitRatio * screenWidth, screenHeight);
+//     glClearColor(0.8f, 0.2f, 0.2f, 1.0f); // Red color for left pane
+//     glClear(GL_COLOR_BUFFER_BIT);
+
+//     // Render right pane
+//     glViewport(splitRatio * screenWidth, 0, (1.0f - splitRatio) * screenWidth, screenHeight);
+//     glClearColor(0.2f, 0.2f, 0.8f, 1.0f); // Blue color for right pane
+//     glClear(GL_COLOR_BUFFER_BIT);
+// }

@@ -16,16 +16,16 @@ Mesh::Mesh(Shader shader) : m_shader(shader) {
 	setupMesh();
 }
 
-void Mesh::draw() {
+/* For now, pass in matrices directly. In future, consider accessing differently */
+void Mesh::draw(const mat4& viewMatrix, const mat4& projectionMatrix) {
 	if (dirty) {
 		bufferData();
 		dirty = false;
 	}
 
 	m_shader.use();
-	// TODO: getting the camera matrices probably shouldn't belong here. Or at least, it should be cached in the Camera class.
-	m_shader.setValue(Constants::VIEW_MATRIX, Camera::getInstance().calcViewMatrix());
-	m_shader.setValue(Constants::PROJECTION_MATRIX, Camera::getInstance().calcProjectionMatrix());
+	m_shader.setValue(Constants::VIEW_MATRIX, viewMatrix);
+	m_shader.setValue(Constants::PROJECTION_MATRIX, projectionMatrix);
 	glBindVertexArray(VAO);
 	glDrawElements(drawMode, m_indices.size(), GL_UNSIGNED_INT, 0); // DRAW
 	glBindVertexArray(0); // unbind

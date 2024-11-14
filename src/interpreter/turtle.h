@@ -4,6 +4,7 @@
 #include <glad/gl.h>
 #include <glm/glm.hpp>
 using glm::vec3;
+using glm::mat4;
 #include "mesh.h"
 
 // This turtle draws the skeleton of the geometry.
@@ -31,7 +32,7 @@ public:
     float getPitch() const { return pitch; }
     uint getPositionIndex() const { return positionIndex; }
     void setPositionIndex(uint index) { positionIndex = index; }
-    void draw();
+    void draw(const mat4& viewMatrix, const mat4& projectionMatrix) { mesh.draw(viewMatrix, projectionMatrix); }
 
 private:
     static bool _instantiated;

@@ -6,6 +6,8 @@
 #include <vector>
 using std::vector;
 #include <glad/gl.h>
+#include <glm/glm.hpp>
+using glm::mat4;
 
 class Mesh {
 public:
@@ -15,7 +17,7 @@ public:
 	void addIndex(uint index);
 	void setupMesh();
 	void setDrawMode(GLenum mode) { drawMode = mode; }
-	void draw();
+	void draw(const mat4& viewMatrix, const mat4& projectionMatrix);
 
 private:
 	void bufferData();

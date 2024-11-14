@@ -11,10 +11,7 @@ using glm::mat4;
 // Singleton class
 class Camera {
 public:
-    static Camera& getInstance(const vec3& position = vec3(0.0f, 0.0f, 10.0f), const vec3& front = vec3(0.0f, 0.0f, -1.0f)) {
-        static Camera instance(position, front);
-        return instance;
-    }
+    Camera(const vec3& position = vec3(0.0f, 0.0f, 10.0f), const vec3& front = vec3(0.0f, 0.0f, -1.0f));
 
 	const vec3& getCameraPosition();
 	void setCameraPosition(const vec3& pos);
@@ -28,9 +25,6 @@ public:
 	const mat4& calcProjectionMatrix(const float width = Constants::SCR_WIDTH, const float height = Constants::SCR_HEIGHT);
 
 private:
-    Camera(const vec3& position, const vec3& front);
-    Camera(const Camera&) = delete;
-    Camera& operator=(const Camera&) = delete;
 	mat4 viewMatrix;
 	mat4 projectionMatrix;
 	vec3 cameraPos;
