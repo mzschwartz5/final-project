@@ -7,10 +7,9 @@ using glm::dvec3;
 using std::string;
 
 namespace Constants {
-	inline constexpr float SCR_WIDTH{ 1066.0 };
-	inline constexpr float SCR_HEIGHT{ 600.0 };
+	inline constexpr unsigned int SCR_WIDTH{ 1066 };
+	inline constexpr unsigned int SCR_HEIGHT{ 600 };
 	inline constexpr dvec3 ORIGIN{0.0, 0.0, 0.0};
-	inline constexpr float VIEWPORT_BORDER_WIDTH{ 2.0f };
 	inline const string VIEW_MATRIX = "view";
 	inline const string PROJECTION_MATRIX = "projection";
 }
