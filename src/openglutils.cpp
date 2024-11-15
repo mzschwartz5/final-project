@@ -95,9 +95,8 @@ void bindMouseInputsToWindow(GLFWwindow* window, MouseCallbackContext context) {
         lastX = xpos;
         lastY = ypos;
 
-        // Mouse is in the border bar between the two viewports
-        if (activeViewport == Viewport::BORDER ||
-            resizingViewports) {
+        // Mouse is in the border bar between the two viewports and we're not currently adjusting either camera.
+        if (!currentCamera && (activeViewport == Viewport::BORDER || resizingViewports)) {
             splitViewport->setViewportSplitRatio(cursorXPos / Constants::SCR_WIDTH);
             resizingViewports = true;
             return;
