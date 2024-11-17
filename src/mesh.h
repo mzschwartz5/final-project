@@ -15,6 +15,7 @@ public:
 	Mesh(vector<Vertex>&& vertices, vector<unsigned int>&& indices, Shader shader);
 	uint addVertex(Vertex&& vertex);
 	void addIndex(uint index);
+	unsigned int getNumIndices() { return m_indices.size(); }
 	void setupMesh();
 	void setDrawMode(GLenum mode) { drawMode = mode; }
 	void draw(const mat4& viewMatrix, const mat4& projectionMatrix);

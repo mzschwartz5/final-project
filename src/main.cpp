@@ -15,6 +15,9 @@
 #include "interpreter/nodes/restoretransformnode.h"
 #include <list>
 #include "openglutils.h"
+#include <vector>
+#include "metaball/metaball.h"
+#include "metaball/metaballrenderer.h"
 
 int main() {
     // Top level error handling
@@ -85,6 +88,11 @@ int main() {
 
 		interpreter.run(nodeList);
 
+		std::vector<Metaball> metaballs;
+		metaballs.push_back(Metaball{ glm::vec3(0.0f), glm::vec3{1.0f}, 1.0f });
+
+		MetaballRenderer metaballRenderer(metaballs);
+
 		// Main render loop
 		// Draw images until told to explicitly stop (e.g. x out of window)
 		while (!glfwWindowShouldClose(window))
@@ -96,7 +104,7 @@ int main() {
 			turtle.draw(cameraLeft.calcViewMatrix(), cameraLeft.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::LEFT)));
 			// Render right viewport
 			splitViewport.setViewport(OpenGLUtils::Viewport::RIGHT);
-			turtle.draw(cameraRight.calcViewMatrix(), cameraRight.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)));
+			metaballRenderer.render(cameraRight.calcViewMatrix(), cameraRight.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)));
 
 			// Render a border bar between the two viewports
 			splitViewport.setViewport(OpenGLUtils::Viewport::BORDER);

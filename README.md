@@ -153,3 +153,6 @@ Taking inspiration from a particular natural phenomenon or distinctive set of vi
 
 ### YOUR OWN PROPOSAL
 - You are of course welcome to propose your own topic . Regardless of what you choose, you and your team must research your topic and relevant techniques and come up with a detailed plan of execution. You will meet with some subset of the procedural staff before starting implementation for approval.
+
+### Tracking attributions:
+[Marching cubes python implementation](https://github.com/BorisTheBrave/mc-dc/blob/a165b326849d8814fb03c963ad33a9faf6cc6dea/marching_cubes_3d.py)
