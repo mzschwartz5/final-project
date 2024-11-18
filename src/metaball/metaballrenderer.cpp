@@ -23,12 +23,14 @@ void MetaballRenderer::createMesh() {
 
 void MetaballRenderer::marchingCubesSingleCell(const glm::vec3& cellCorner) {
     array<float, 8> fieldValues;
+    array<vec3, 8> gradientValues;
     int caseIndex = 0;
     for (int i = 0; i < 8; i++) {
         glm::vec3 vertexPosition = cellCorner + glm::vec3(VERTICES[i][0], VERTICES[i][1], VERTICES[i][2]) * gridResolution;
         fieldValues[i] = metaballField(vertexPosition);
+        gradientValues[i] = metaballGradient(vertexPosition);
 
-        if (fieldValues[i] > isoLevel) continue;
+        if (fieldValues[i] < isoLevel) continue;
         caseIndex += (1 << i);
     }
 
@@ -50,8 +52,12 @@ void MetaballRenderer::marchingCubesSingleCell(const glm::vec3& cellCorner) {
                             + (vec3(vertexA[0], vertexA[1], vertexA[2]) * t0
                             + vec3(vertexB[0], vertexB[1], vertexB[2]) * t1) * gridResolution;
 
+            const vec3 newNormal = glm::normalize(
+                gradientValues[edge[0]] * t0 + gradientValues[edge[1]] * t1
+            );
+
             // No attempt made to remove duplicate vertices; this is a simple implementation, a proof of concept.
-            mesh.addVertex(Vertex(newVert, vec3(0.0f), vec3(0.0f)));
+            mesh.addVertex(Vertex(newVert, newNormal, vec3(0.0f)));
         }
 
         int numIndices = mesh.getNumIndices();
@@ -72,4 +78,12 @@ float MetaballRenderer::metaballField(const glm::vec3& point) {
         field += metaball.evaluate(point);
     }
     return field;
+}
+
+vec3 MetaballRenderer::metaballGradient(const vec3& point) {
+    vec3 gradient = vec3(0.0f);
+    for (const Metaball& metaball : metaballs) {
+        gradient += metaball.gradient(point);
+    }
+    return gradient;
 }

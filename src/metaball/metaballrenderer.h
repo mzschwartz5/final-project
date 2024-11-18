@@ -14,7 +14,7 @@ class MetaballRenderer {
 public:
     MetaballRenderer(const vector<Metaball>& metaballs) :
         metaballs(metaballs),
-        mesh(Shader("../src/shaders/vertShader.vs", "../src/shaders/fragShader.fs")) {
+        mesh(Shader("../src/shaders/vertShader.vs", "../src/shaders/metaballShader.fs")) {
         assert(!_instantiated);
         _instantiated = true;
         createMesh();
@@ -31,10 +31,12 @@ private:
     void createMesh();
     void marchingCubesSingleCell(const vec3& cellCenter);
     float metaballField(const vec3& point);
+    vec3 metaballGradient(const vec3& point);
     vector<Metaball> metaballs;
     Mesh mesh;
-    float isoLevel = 1.0f;
-    vec3 gridResolution{0.05};
+    // TODO: more work needs to be done to choose the isoLevel dynamically for multiple metaballs
+    float isoLevel = 2.0f;
+    vec3 gridResolution{0.02};
 };
 
 constexpr array<array<int, 3>, 8> VERTICES = {

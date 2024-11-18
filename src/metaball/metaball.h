@@ -17,8 +17,15 @@ public:
     float evaluate(const vec3& point) const {
         // Rather than scaling the metaball (multiplication), we scale the input point (division)
         const vec3 difference = (point / scale) - center;
-        return radius / (difference.x * difference.x + difference.y * difference.y + difference.z * difference.z);
+        return radius * radius / (difference.x * difference.x + difference.y * difference.y + difference.z * difference.z);
     }
+
+    vec3 gradient(const vec3& point) const {
+        const vec3 difference = (point / scale) - center;
+        float squaredDistance = difference.x * difference.x + difference.y * difference.y + difference.z * difference.z;
+        return -2.0f * radius * radius * difference / (scale * squaredDistance * squaredDistance);
+    }
+
 private:
     vec3 center;
     vec3 scale;
