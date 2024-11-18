@@ -158,13 +158,13 @@ Taking inspiration from a particular natural phenomenon or distinctive set of vi
 [Marching cubes python implementation](https://github.com/BorisTheBrave/mc-dc/blob/a165b326849d8814fb03c963ad33a9faf6cc6dea/marching_cubes_3d.py)
 
 ## Build and run
+- This project is set up to run on VSCode, but, with minor modifications, could be made to use MSVC and run in VS, or simply built and run via the command line.
 - Create build folder under the project root directory.
 - Note: the next step requires jinja2 to be installed (can be installed via pip or pip3)
-- It will also do a git submodule update to pull GLFW, Glad, and other dependencies.
-- From the build folder, run `cmake ..` This is the only time you'll need to explicitly run cmake.
-- If this is successful, you can now run `cmake --build . --config Debug` or `cmake --build . --config Release` to generate the executable file in the build/Debug (or /Release) directory.
-- Run the executable: `./Spliced` (or `./Spliced.exe` on Windows)
+  - It will also do a git submodule update to pull GLFW, Glad, and other dependencies.
+  - Also, on Windows, you will need the G++ compiler and Ninja generator.
+- Open the command pallette (Cmd (or Ctrl) + Shift + P) and run "Tasks: Run Build Task" and select Debug or Release. This will configure the project via CMake and build it.
+- You can also run the executable in debug or releaase mode via the command pallette: Cmd (or Ctrl) + Shift + P > "Debug: Select and Start Debugging" (which will also configure and build the project first).
+- You can also run "C/C++: Select a Configuration... > (Win32 | Mac)" to use Intellisense in VSCode.
 
-Alternatively, if developing with VSCode:
-- After running cmake the first time, you can simply open the command pallette (Cmd (or Ctrl) + Shift + P) and run "Tasks: Run Build Task" and select Debug or Release, to build the executable.
-- You can also run the executable in debug or releaase mode via the command pallette: Cmd (or Ctrl) + Shift + P > "Debug: Select and Start Debugging"
+- Alternatively, run the executable directly: `./Spliced` (or `./Spliced.exe` on Windows)

@@ -9,7 +9,8 @@
                 "cwd": "${workspaceFolder}/build"
             },
             "problemMatcher": [],
-            "group": "build"
+            "group": "build",
+            "dependsOn": ["Configure Debug"]
         },
         {
             "label": "Build Release",
@@ -19,7 +20,26 @@
                 "cwd": "${workspaceFolder}/build"
             },
             "problemMatcher": [],
-            "group": "build"
+            "group": "build",
+            "dependsOn": ["Configure Release"]
+        },
+        {
+            "label": "Configure Debug",
+            "type": "shell",
+            "command": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug",
+            "group": "build",
+            "windows": {
+                "command": "cmake -S . -B build -G \"Ninja\" -DCMAKE_BUILD_TYPE=Debug"
+            }
+        },
+        {
+            "label": "Configure Release",
+            "type": "shell",
+            "command": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release",
+            "group": "build",
+            "windows": {
+                "command": "cmake -S . -B build -G \"Ninja\" -DCMAKE_BUILD_TYPE=Release"
+            }
         }
     ]
 }

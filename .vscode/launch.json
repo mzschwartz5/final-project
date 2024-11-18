@@ -38,7 +38,7 @@
             },
             "windows": {
                 "MIMode": "gdb",
-                "program": "${workspaceFolder}/build/Debug/Spliced.exe"
+                "program": "${workspaceFolder}/build/Release/Spliced.exe"
             }
         }
     ]

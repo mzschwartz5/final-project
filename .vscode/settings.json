@@ -53,6 +53,9 @@
         "fstream": "cpp",
         "list": "cpp",
         "format": "cpp",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "xutility": "cpp",
+        "forward_list": "cpp",
+        "xhash": "cpp"
     }
 }

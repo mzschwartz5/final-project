@@ -11,12 +11,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release)
 
+if (WIN32)
+    message(STATUS "Setting compiler to g++")
+    set(CMAKE_CXX_COMPILER "g++")
+endif()
+
 # Set default build type to Debug if not specified
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Building in Debug mode")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 endif()
 
