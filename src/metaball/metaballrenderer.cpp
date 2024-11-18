@@ -37,6 +37,8 @@ void MetaballRenderer::marchingCubesSingleCell(const glm::vec3& cellCorner) {
     const vector<array<int, 3>>& faces = CASES[caseIndex];
 
     for (const array<int, 3>& face : faces) {
+        int newVertIndex = -1;
+
         for (int i = 0; i < 3; ++i) {
             const array<int, 2>& edge = EDGES[face[i]];
             const array<int, 3>& vertexA = VERTICES[edge[0]];
@@ -57,13 +59,12 @@ void MetaballRenderer::marchingCubesSingleCell(const glm::vec3& cellCorner) {
             );
 
             // No attempt made to remove duplicate vertices; this is a simple implementation, a proof of concept.
-            mesh.addVertex(Vertex(newVert, newNormal, vec3(0.0f)));
+            newVertIndex =  mesh.addVertex(Vertex(newVert, newNormal, vec3(0.0f)));
         }
 
-        int numIndices = mesh.getNumIndices();
-        mesh.addIndex(numIndices);
-        mesh.addIndex(numIndices + 1);
-        mesh.addIndex(numIndices + 2);
+        mesh.addIndex(newVertIndex - 2);
+        mesh.addIndex(newVertIndex - 1);
+        mesh.addIndex(newVertIndex);
     }
 }
 
