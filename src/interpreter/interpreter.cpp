@@ -3,7 +3,7 @@
 
 bool Interpreter::_instantiated = false;
 
-void Interpreter::run(list<uPtr<Node>>& nodeList) {
+void Interpreter::run(const list<uPtr<Node>>& nodeList) {
     for (auto& node : nodeList) {
         node->evaluate(*this);
     }

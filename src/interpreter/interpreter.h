@@ -25,7 +25,7 @@ public:
         _instantiated = false;
     }
 
-    void run(list<uPtr<Node>>& nodeList);
+    void run(const list<uPtr<Node>>& nodeList);
     void push(float value);
     float pop();
     Turtle& getTurtle() { return turtle; }
