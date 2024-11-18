@@ -30,8 +30,8 @@ public:
     void setRotation(float yaw, float pitch) { this->yaw = yaw; this->pitch = pitch; }
     float getYaw() const { return yaw; }
     float getPitch() const { return pitch; }
-    uint getPositionIndex() const { return positionIndex; }
-    void setPositionIndex(uint index) { positionIndex = index; }
+    unsigned int getPositionIndex() const { return positionIndex; }
+    void setPositionIndex(unsigned int index) { positionIndex = index; }
     void draw(const mat4& viewMatrix, const mat4& projectionMatrix) { mesh.draw(viewMatrix, projectionMatrix); }
 
 private:

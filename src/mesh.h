@@ -13,8 +13,8 @@ class Mesh {
 public:
 	Mesh(Shader shader);
 	Mesh(vector<Vertex>&& vertices, vector<unsigned int>&& indices, Shader shader);
-	uint addVertex(Vertex&& vertex);
-	void addIndex(uint index);
+	unsigned int addVertex(Vertex&& vertex);
+	void addIndex(unsigned int index);
 	void setupMesh();
 	void setDrawMode(GLenum mode) { drawMode = mode; }
 	void draw(const mat4& viewMatrix, const mat4& projectionMatrix);

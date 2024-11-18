@@ -156,3 +156,15 @@ Taking inspiration from a particular natural phenomenon or distinctive set of vi
 
 ### Tracking attributions:
 [Marching cubes python implementation](https://github.com/BorisTheBrave/mc-dc/blob/a165b326849d8814fb03c963ad33a9faf6cc6dea/marching_cubes_3d.py)
+
+## Build and run
+- Create build folder under the project root directory
+- Note: the next step will install pip and (through pip) jinja2, if not already installed.
+- It will also do a git submodule update to pull GLFW, Glad, and other dependencies.
+- From the build folder, run `cmake ..`
+- If this is successful, you can now run `cmake --build . --config Debug` or `cmake --build . --config Release` to generate the executable file in the build directory.
+- Run the executable: `./Spliced`
+
+Alternatively, if developing with VSCode:
+- After running cmake the first time, you can simply open the command pallette (Cmd (or Ctrl) + Shift + P) and run "Tasks: Run Build Task" and select Debug or Release, to build the executable.
+- You can also run the executable in debug or releaase mode via the command pallette: Cmd (or Ctrl) + Shift + P > "Debug: Select and Start Debugging"

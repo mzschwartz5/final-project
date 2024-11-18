@@ -8,6 +8,9 @@ project(Spliced)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release)
+
 # Set default build type to Debug if not specified
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
@@ -34,7 +37,7 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
                         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                         RESULT_VARIABLE GIT_SUBMOD_RESULT)
         if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-            message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+            message(FATAL_ERROR "git submodule u`date --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
         endif()
     endif()
 endif()
@@ -54,6 +57,23 @@ endif()
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/stb/stb_image.h")
     message(FATAL_ERROR "The STB submodule was not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+endif()
+
+# Ensure pip + jinja2 is installed
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} -m ensurepip
+    RESULT_VARIABLE ENSUREPIP_RESULT
+)
+if(NOT ENSUREPIP_RESULT EQUAL "0")
+    message(FATAL_ERROR "Failed to ensure pip is installed. Please check your Python installation.")
+endif()
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} -m pip install --user jinja2
+    RESULT_VARIABLE JINJA2_INSTALL_RESULT
+)
+if(NOT JINJA2_INSTALL_RESULT EQUAL "0")
+    message(FATAL_ERROR "Failed to install jinja2. Please ensure pip is installed and try again.")
 endif()
 
 # Include directories for header files

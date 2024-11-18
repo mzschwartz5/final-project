@@ -21,7 +21,7 @@ void Turtle::setPosition(const vec3& pos, bool draw) {
 
     if (!draw) return;
 
-    uint vertIndex = mesh.addVertex(
+    unsigned int vertIndex = mesh.addVertex(
         Vertex(
             pos,
             vec3(0.0f, 0.0f, 0.0f), // normal (hardcoded for now)

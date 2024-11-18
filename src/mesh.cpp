@@ -32,13 +32,13 @@ void Mesh::draw(const mat4& viewMatrix, const mat4& projectionMatrix) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind
 }
 
-uint Mesh::addVertex(Vertex&& vertex) {
+unsigned int Mesh::addVertex(Vertex&& vertex) {
 	m_vertices.push_back(vertex);
 	dirty = true;
 	return m_vertices.size() - 1;
 }
 
-void Mesh::addIndex(uint index) {
+void Mesh::addIndex(unsigned int index) {
 	m_indices.push_back(index);
 	dirty = true;
 }

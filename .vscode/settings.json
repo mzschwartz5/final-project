@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.cu": "cuda-cpp",
         "iostream": "cpp",
         "__bit_reference": "cpp",
         "__config": "cpp",
@@ -50,6 +51,8 @@
         "vector": "cpp",
         "algorithm": "cpp",
         "fstream": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "format": "cpp",
+        "xstring": "cpp"
     }
 }

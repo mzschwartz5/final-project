@@ -5,7 +5,7 @@
             "name": "Spliced Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/Spliced",
+            "program": "${workspaceFolder}/build/Debug/Spliced",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build",
@@ -13,6 +13,33 @@
             "externalConsole": false,
             "preLaunchTask": "Build Debug",
             "MIMode": "lldb",
+            "osx": {
+                "MIMode": "lldb"
+            },
+            "windows": {
+                "MIMode": "gdb",
+                "program": "${workspaceFolder}/build/Debug/Spliced.exe"
+            }
+        },
+        {
+            "name": "Spliced Release",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/Release/Spliced",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build",
+            "environment": [],
+            "externalConsole": false,
+            "preLaunchTask": "Build Release",
+            "MIMode": "lldb",
+            "osx": {
+                "MIMode": "lldb"
+            },
+            "windows": {
+                "MIMode": "gdb",
+                "program": "${workspaceFolder}/build/Debug/Spliced.exe"
+            }
         }
     ]
 }
