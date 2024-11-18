@@ -59,23 +59,6 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/stb/stb_image.h")
     message(FATAL_ERROR "The STB submodule was not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
-# Ensure pip + jinja2 is installed
-find_package(Python3 COMPONENTS Interpreter REQUIRED)
-execute_process(
-    COMMAND ${Python3_EXECUTABLE} -m ensurepip
-    RESULT_VARIABLE ENSUREPIP_RESULT
-)
-if(NOT ENSUREPIP_RESULT EQUAL "0")
-    message(FATAL_ERROR "Failed to ensure pip is installed. Please check your Python installation.")
-endif()
-execute_process(
-    COMMAND ${Python3_EXECUTABLE} -m pip install --user jinja2
-    RESULT_VARIABLE JINJA2_INSTALL_RESULT
-)
-if(NOT JINJA2_INSTALL_RESULT EQUAL "0")
-    message(FATAL_ERROR "Failed to install jinja2. Please ensure pip is installed and try again.")
-endif()
-
 # Include directories for header files
 target_include_directories(Spliced PRIVATE ${CMAKE_SOURCE_DIR}/src
                                             ${CMAKE_SOURCE_DIR}/external/glm
