@@ -13,10 +13,13 @@ class Mesh {
 public:
 	Mesh(Shader shader);
 	Mesh(vector<Vertex>&& vertices, vector<unsigned int>&& indices, Shader shader);
+	~Mesh();
 	unsigned int addVertex(Vertex&& vertex);
 	void addIndex(unsigned int index);
 	void setupMesh();
 	void setDrawMode(GLenum mode) { drawMode = mode; }
+	unsigned int addSSBO(const void* data, size_t size);
+	void updateSSBO(unsigned int SSBO, const void* data, size_t size);
 	void draw(const mat4& viewMatrix, const mat4& projectionMatrix);
 
 private:
@@ -31,6 +34,7 @@ private:
 
 	// Render data (OpenGL objects)
 	unsigned int VAO, VBO, EBO;
+	vector<unsigned int> SSBOs;
 	GLenum drawMode = GL_TRIANGLES;
 };
 

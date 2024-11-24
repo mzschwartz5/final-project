@@ -18,6 +18,8 @@
 #include <vector>
 #include "metaball/metaball.h"
 #include "metaball/metaballrenderer.h"
+#include "metaball/raymarchingrenderer.h"
+#include "shader.h"
 
 int main() {
     // Top level error handling
@@ -89,10 +91,10 @@ int main() {
 		interpreter.run(nodeList);
 
 		std::vector<Metaball> metaballs;
-		metaballs.push_back(Metaball{ glm::vec3(0.0), glm::vec3{1.0f}, 1.0f });
+		metaballs.push_back(Metaball{ glm::vec3(0.5), glm::vec3{2.0f, 0.5f, 0.5f}, 1.0f });
 
-		MetaballRenderer metaballRenderer(metaballs);
-
+		// MetaballRenderer metaballRenderer(metaballs);
+		RaymarchingRenderer raymarchingRenderer(metaballs, Quad(Shader("../src/shaders/fullscreen.vs", "../src/shaders/raymarch.fs")));
 		// Main render loop
 		// Draw images until told to explicitly stop (e.g. x out of window)
 		while (!glfwWindowShouldClose(window))
@@ -104,7 +106,8 @@ int main() {
 			turtle.draw(cameraLeft.calcViewMatrix(), cameraLeft.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::LEFT)));
 			// Render right viewport
 			splitViewport.setViewport(OpenGLUtils::Viewport::RIGHT);
-			metaballRenderer.render(cameraRight.calcViewMatrix(), cameraRight.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)));
+			// metaballRenderer.render(cameraRight.calcViewMatrix(), cameraRight.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)));
+			raymarchingRenderer.render(cameraRight.calcViewMatrix(), cameraRight.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)));
 
 			// Render a border bar between the two viewports
 			splitViewport.setViewport(OpenGLUtils::Viewport::BORDER);

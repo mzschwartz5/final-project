@@ -10,7 +10,7 @@ public:
     ~Metaball() {};
 
     float getRadius() const { return radius; }
-    float getScale() const { return scale.x; }
+    const vec3& getScale() const { return scale; }
     const vec3& getCenter() const { return center; }
 
     // Evaluate the metaball field (an inverse square field) at a given point

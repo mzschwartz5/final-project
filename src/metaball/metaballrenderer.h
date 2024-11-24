@@ -3,7 +3,6 @@
 #include "../mesh.h"
 #include <array>
 #include <vector>
-#include <functional>
 #include "metaball.h"
 using std::vector;
 using std::array;
@@ -36,7 +35,7 @@ private:
     Mesh mesh;
     // TODO: more work needs to be done to choose the isoLevel dynamically for multiple metaballs
     float isoLevel = 2.0f;
-    vec3 gridResolution{0.02};
+    vec3 gridResolution{0.05};
 };
 
 constexpr array<array<int, 3>, 8> VERTICES = {

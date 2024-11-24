@@ -16,6 +16,16 @@ Mesh::Mesh(Shader shader) : m_shader(shader) {
 	setupMesh();
 }
 
+Mesh::~Mesh() {
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+
+	for (unsigned int SSBO : SSBOs) {
+		glDeleteBuffers(1, &SSBO);
+	}
+}
+
 /* For now, pass in matrices directly. In future, consider accessing differently */
 void Mesh::draw(const mat4& viewMatrix, const mat4& projectionMatrix) {
 	if (dirty) {
@@ -26,10 +36,32 @@ void Mesh::draw(const mat4& viewMatrix, const mat4& projectionMatrix) {
 	m_shader.use();
 	m_shader.setValue(Constants::VIEW_MATRIX, viewMatrix);
 	m_shader.setValue(Constants::PROJECTION_MATRIX, projectionMatrix);
+
+	for (unsigned int SSBO : SSBOs) {
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO, SSBO);
+	}
+
 	glBindVertexArray(VAO);
 	glDrawElements(drawMode, m_indices.size(), GL_UNSIGNED_INT, 0); // DRAW
 	glBindVertexArray(0); // unbind
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind
+
+}
+
+unsigned int Mesh::addSSBO(const void* data, size_t size) {
+	unsigned int SSBO;
+	glGenBuffers(1, &SSBO);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_STATIC_DRAW);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBOs.size(), SSBO);
+	SSBOs.push_back(SSBO);
+	return SSBO;
+}
+
+void Mesh::updateSSBO(unsigned int SSBO, const void* data, size_t size) {
+	// TODO: use glBufferSubData when possible
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_STATIC_DRAW);
 }
 
 unsigned int Mesh::addVertex(Vertex&& vertex) {
