@@ -78,7 +78,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/external/glfw)
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/glad/cmake)
 
 # Function defined in glad cmake file
-glad_add_library(glad STATIC API gl:core=4.1)
+glad_add_library(glad STATIC API gl:core=4.3)
 
 # Link libraries
 target_link_libraries(Spliced glfw glad ${CMAKE_DL_LIBS})

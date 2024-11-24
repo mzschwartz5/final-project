@@ -12,7 +12,7 @@ using glm::vec3;
 
 class RaymarchingRenderer {
 public:
-    RaymarchingRenderer(const vector<Metaball>& metaballs, const Quad& quad);
+    RaymarchingRenderer(const vector<Metaball>& metaballs, Quad&& quad);
     ~RaymarchingRenderer();
 
     void render(const mat4& viewMatrix, const mat4& projectionMatrix);

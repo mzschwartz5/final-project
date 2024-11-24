@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 out vec4 FragColor;
 
 layout(std430, binding = 0) buffer MetaballPositions {

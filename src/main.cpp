@@ -94,7 +94,9 @@ int main() {
 		metaballs.push_back(Metaball{ glm::vec3(0.5), glm::vec3{2.0f, 0.5f, 0.5f}, 1.0f });
 
 		// MetaballRenderer metaballRenderer(metaballs);
-		RaymarchingRenderer raymarchingRenderer(metaballs, Quad(Shader("../src/shaders/fullscreen.vs", "../src/shaders/raymarch.fs")));
+		Quad fullScreenQuad(Shader("../src/shaders/fullscreen.vs", "../src/shaders/raymarch.fs"));
+		RaymarchingRenderer raymarchingRenderer(metaballs, std::move(fullScreenQuad));
+		
 		// Main render loop
 		// Draw images until told to explicitly stop (e.g. x out of window)
 		while (!glfwWindowShouldClose(window))

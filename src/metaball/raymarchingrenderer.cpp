@@ -2,9 +2,9 @@
 
 bool RaymarchingRenderer::_instantiated = false;
 
-RaymarchingRenderer::RaymarchingRenderer(const vector<Metaball>& metaballs, const Quad& quad) :
+RaymarchingRenderer::RaymarchingRenderer(const vector<Metaball>& metaballs, Quad&& quad) :
     metaballs(metaballs),
-    quad(quad) {
+    quad(std::move(quad)) {
 
     assert(!_instantiated);
     _instantiated = true;
@@ -21,9 +21,9 @@ RaymarchingRenderer::RaymarchingRenderer(const vector<Metaball>& metaballs, cons
     }
 
     Mesh& quadMesh = this->quad.getMesh();
-    metaballPositionsBuffer = quadMesh.addSSBO(&positions, sizeof(vec3) * metaballs.size());
-    metaballScaleBuffer = quadMesh.addSSBO(&scales, sizeof(vec3) * metaballs.size());
-    metaballRadiiBuffer = quadMesh.addSSBO(&radii, sizeof(float) * metaballs.size());
+    metaballPositionsBuffer = quadMesh.addSSBO(positions.data(), sizeof(vec3) * metaballs.size());
+    metaballScaleBuffer = quadMesh.addSSBO(scales.data(), sizeof(vec3) * metaballs.size());
+    metaballRadiiBuffer = quadMesh.addSSBO(radii.data(), sizeof(float) * metaballs.size());
 }
 
 RaymarchingRenderer::~RaymarchingRenderer() {

@@ -37,8 +37,8 @@ void Mesh::draw(const mat4& viewMatrix, const mat4& projectionMatrix) {
 	m_shader.setValue(Constants::VIEW_MATRIX, viewMatrix);
 	m_shader.setValue(Constants::PROJECTION_MATRIX, projectionMatrix);
 
-	for (unsigned int SSBO : SSBOs) {
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO, SSBO);
+	for (unsigned int i = 0; i < SSBOs.size(); i++) {
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, i, SSBOs[i]);
 	}
 
 	glBindVertexArray(VAO);
