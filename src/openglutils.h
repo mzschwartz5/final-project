@@ -20,6 +20,7 @@ class SplitViewport {
 
 public:
     SplitViewport(Camera* cameraLeft, Camera* cameraRight);
+    float getViewportSplitRatio() const { return viewportSplitRatio; }
     void setViewportSplitRatio(double ratio);
     void setViewport(Viewport viewPort);
     void drawViewportBorder();

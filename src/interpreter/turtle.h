@@ -32,7 +32,7 @@ public:
     float getPitch() const { return pitch; }
     unsigned int getPositionIndex() const { return positionIndex; }
     void setPositionIndex(unsigned int index) { positionIndex = index; }
-    void draw(const mat4& viewMatrix, const mat4& projectionMatrix) { mesh.draw(viewMatrix, projectionMatrix); }
+    void draw(const mat4& viewMatrix, const mat4& projectionMatrix);
 
 private:
     static bool _instantiated;

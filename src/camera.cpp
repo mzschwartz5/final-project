@@ -18,11 +18,11 @@ void Camera::setCameraPosition(const vec3& position) {
 	cameraPos = position;
 }
 
-const vec3& Camera::getCameraPosition() {
+const vec3& Camera::getCameraPosition() const {
 	return cameraPos;
 }
 
-const vec3& Camera::getCameraFront() {
+const vec3& Camera::getCameraFront() const {
 	return cameraFront;
 }
 
@@ -56,15 +56,15 @@ void Camera::updateCameraVectors() {
 
 }
 
-const vec3& Camera::getCameraRight() {
+const vec3& Camera::getCameraRight() const {
 	return cameraRight;
 }
 
-const vec3& Camera::getCameraUp() {
+const vec3& Camera::getCameraUp() const {
 	return cameraUp;
 }
 
-float Camera::getFov() {
+float Camera::getFov() const {
 	return fov;
 }
 
@@ -88,6 +88,27 @@ const mat4& Camera::calcViewMatrix() {
 }
 
 const mat4& Camera::calcProjectionMatrix(const float width, const float height) {
-	projectionMatrix = glm::perspective(glm::radians(fov), width / height, 0.1f, 100.0f); // TODO - no magic numbers for near and far clip planes
+	screenHeight = height;
+	screenWidth = width;
+	projectionMatrix = glm::perspective(glm::radians(fov), width / height, nearPlane, farPlane);
 	return projectionMatrix;
+}
+
+float Camera::getNearPlane() const {
+	return nearPlane;
+}
+
+float Camera::getFarPlane() const {
+	return farPlane;
+}
+
+vec2 Camera::getScreenDims() const {
+	return vec2(screenWidth, screenHeight);
+}
+
+vec2 Camera::getNearPlaneDims() const {
+    float aspectRatio = screenWidth / screenHeight;
+    float nearPlaneHeight = 2.0f * tan(glm::radians(fov / 2.0f));
+    float nearPlaneWidth = nearPlaneHeight * aspectRatio;
+    return vec2(nearPlaneWidth, nearPlaneHeight);
 }

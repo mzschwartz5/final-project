@@ -20,7 +20,8 @@ public:
 	void setDrawMode(GLenum mode) { drawMode = mode; }
 	unsigned int addSSBO(const void* data, size_t size);
 	void updateSSBO(unsigned int SSBO, const void* data, size_t size);
-	void draw(const mat4& viewMatrix, const mat4& projectionMatrix);
+	void draw();
+	Shader& getShader() { return m_shader; }
 
 private:
 	void bufferData();

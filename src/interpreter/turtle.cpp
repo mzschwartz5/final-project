@@ -1,5 +1,14 @@
 #include "turtle.h"
+#include "../constants.h"
 bool Turtle::_instantiated = false;
+
+void Turtle::draw(const mat4& viewMatrix, const mat4& projectionMatrix) {
+    Shader& shader = mesh.getShader();
+    shader.use();
+    shader.setValue(Constants::VIEW_MATRIX, viewMatrix);
+    shader.setValue(Constants::PROJECTION_MATRIX, projectionMatrix);
+    mesh.draw();
+}
 
 void Turtle::rotate(float yaw, float pitch) {
     this->yaw += yaw;

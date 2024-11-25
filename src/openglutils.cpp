@@ -148,6 +148,8 @@ SplitViewport::SplitViewport(Camera* const cameraLeft, Camera* const cameraRight
         {Viewport::BORDER, nullptr}
     })
 {
+    cameraLeft->setScreenDims(viewports[Viewport::LEFT][2], viewports[Viewport::LEFT][3]);
+    cameraRight->setScreenDims(viewports[Viewport::RIGHT][2], viewports[Viewport::RIGHT][3]);
 }
 
 void SplitViewport::setViewport(Viewport viewportType) {

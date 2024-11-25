@@ -1,7 +1,16 @@
 #include "metaballrenderer.h"
 #include "../vertex.h"
+#include "../constants.h"
 
 bool MetaballRenderer::_instantiated = false;
+
+void MetaballRenderer::render(const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix) {
+    Shader& shader = mesh.getShader();
+    shader.use();
+    shader.setValue(Constants::VIEW_MATRIX, viewMatrix);
+    shader.setValue(Constants::PROJECTION_MATRIX, projectionMatrix);
+    mesh.draw();
+}
 
 void MetaballRenderer::createMesh() {
     vec3 minBounds {std::numeric_limits<float>::max()};

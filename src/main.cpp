@@ -91,7 +91,8 @@ int main() {
 		interpreter.run(nodeList);
 
 		std::vector<Metaball> metaballs;
-		metaballs.push_back(Metaball{ glm::vec3(0.5), glm::vec3{2.0f, 0.5f, 0.5f}, 1.0f });
+		metaballs.push_back(Metaball{ glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3{1.0f, 1.0f, 1.0f}, 1.0f });
+		metaballs.push_back(Metaball{ glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3{1.0f, 1.0f, 1.0f}, 1.0f });
 
 		// MetaballRenderer metaballRenderer(metaballs);
 		Quad fullScreenQuad(Shader("../src/shaders/fullscreen.vs", "../src/shaders/raymarch.fs"));
@@ -109,7 +110,13 @@ int main() {
 			// Render right viewport
 			splitViewport.setViewport(OpenGLUtils::Viewport::RIGHT);
 			// metaballRenderer.render(cameraRight.calcViewMatrix(), cameraRight.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)));
-			raymarchingRenderer.render(cameraRight.calcViewMatrix(), cameraRight.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)));
+			raymarchingRenderer.render(
+				cameraRight.calcViewMatrix(),
+				glm::vec2(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)),
+				splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT),
+				cameraRight.getNearPlaneDims(),
+				cameraRight.getNearPlane()
+			);
 
 			// Render a border bar between the two viewports
 			splitViewport.setViewport(OpenGLUtils::Viewport::BORDER);

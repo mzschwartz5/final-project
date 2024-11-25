@@ -24,8 +24,8 @@ public:
         )
         {}
 
-    void draw(const mat4& viewMatrix, const mat4& projectionMatrix) {
-        mesh.draw(viewMatrix, projectionMatrix);
+    void draw() {
+        mesh.draw();
     }
 
     Mesh& getMesh() {

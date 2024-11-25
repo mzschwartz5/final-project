@@ -27,15 +27,11 @@ Mesh::~Mesh() {
 }
 
 /* For now, pass in matrices directly. In future, consider accessing differently */
-void Mesh::draw(const mat4& viewMatrix, const mat4& projectionMatrix) {
+void Mesh::draw() {
 	if (dirty) {
 		bufferData();
 		dirty = false;
 	}
-
-	m_shader.use();
-	m_shader.setValue(Constants::VIEW_MATRIX, viewMatrix);
-	m_shader.setValue(Constants::PROJECTION_MATRIX, projectionMatrix);
 
 	for (unsigned int i = 0; i < SSBOs.size(); i++) {
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, i, SSBOs[i]);

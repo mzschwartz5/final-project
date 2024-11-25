@@ -23,7 +23,7 @@ public:
         _instantiated = false;
     }
 
-    void render(const mat4& viewMatrix, const mat4& projectionMatrix) { mesh.draw(viewMatrix, projectionMatrix); }
+    void render(const mat4& viewMatrix, const mat4& projectionMatrix);
 
 private:
     static bool _instantiated;
@@ -34,7 +34,7 @@ private:
     vector<Metaball> metaballs;
     Mesh mesh;
     // TODO: more work needs to be done to choose the isoLevel dynamically for multiple metaballs
-    float isoLevel = 2.0f;
+    float isoLevel = 1.0f;
     vec3 gridResolution{0.05};
 };
 
