@@ -15,11 +15,6 @@
 #include "interpreter/nodes/restoretransformnode.h"
 #include <list>
 #include "openglutils.h"
-#include <vector>
-#include "metaball/metaball.h"
-#include "metaball/metaballrenderer.h"
-#include "metaball/raymarchingrenderer.h"
-#include "shader.h"
 
 int main() {
     // Top level error handling
@@ -90,14 +85,6 @@ int main() {
 
 		interpreter.run(nodeList);
 
-		std::vector<Metaball> metaballs;
-		metaballs.push_back(Metaball{ glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3{1.0f, 1.0f, 1.0f}, 1.0f });
-		metaballs.push_back(Metaball{ glm::vec3(-5.0f, 0.0f, 0.0f), glm::vec3{1.0f, 1.0f, 1.0f}, 1.0f });
-
-		// MetaballRenderer metaballRenderer(metaballs);
-		Quad fullScreenQuad(Shader("../src/shaders/fullscreen.vs", "../src/shaders/raymarch.fs"));
-		RaymarchingRenderer raymarchingRenderer(metaballs, std::move(fullScreenQuad));
-		
 		// Main render loop
 		// Draw images until told to explicitly stop (e.g. x out of window)
 		while (!glfwWindowShouldClose(window))
@@ -106,11 +93,10 @@ int main() {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			// Render left viewport
 			splitViewport.setViewport(OpenGLUtils::Viewport::LEFT);
-			turtle.draw(cameraLeft.calcViewMatrix(), cameraLeft.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::LEFT)));
+			turtle.drawLines(cameraLeft.calcViewMatrix(), cameraLeft.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::LEFT)));
 			// Render right viewport
 			splitViewport.setViewport(OpenGLUtils::Viewport::RIGHT);
-			// metaballRenderer.render(cameraRight.calcViewMatrix(), cameraRight.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)));
-			raymarchingRenderer.render(
+			turtle.drawGeometry(
 				cameraRight.calcViewMatrix(),
 				glm::vec2(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)),
 				splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT),

@@ -1,13 +1,36 @@
 #include "turtle.h"
 #include "../constants.h"
+#include "../mathutils.h"
+#include <array>
+
 bool Turtle::_instantiated = false;
 
-void Turtle::draw(const mat4& viewMatrix, const mat4& projectionMatrix) {
+void Turtle::drawLines(const mat4& viewMatrix, const mat4& projectionMatrix) {
     Shader& shader = mesh.getShader();
     shader.use();
     shader.setValue(Constants::VIEW_MATRIX, viewMatrix);
     shader.setValue(Constants::PROJECTION_MATRIX, projectionMatrix);
     mesh.draw();
+}
+
+void Turtle::drawGeometry(
+    const mat4& viewMatrix, 
+    const vec2& viewportDims,
+    float viewportOffset,
+    const vec2& nearPlaneDims,
+    float nearPlaneDistance
+) {
+    raymarchingRenderer.render(
+        viewMatrix,
+        viewportDims,
+        viewportOffset,
+        nearPlaneDims,
+        nearPlaneDistance
+    );
+}
+
+void Turtle::finalize() {
+    raymarchingRenderer.setMetaballs(metaballs);
 }
 
 void Turtle::rotate(float yaw, float pitch) {
@@ -26,10 +49,12 @@ void Turtle::move(float distance, bool draw) {
 }
 
 void Turtle::setPosition(const vec3& pos, bool draw) {
-    position = pos;
+    if (!draw) {
+        position = pos;
+        return;
+    }
 
-    if (!draw) return;
-
+    // Add vertices for drawing turtle lines
     unsigned int vertIndex = mesh.addVertex(
         Vertex(
             pos,
@@ -41,5 +66,15 @@ void Turtle::setPosition(const vec3& pos, bool draw) {
     mesh.addIndex(positionIndex);
     mesh.addIndex(vertIndex);
 
+    // Add metaballs for rendering 3D geometry
+    std::array<vec3, METABALLS_PER_SEGMENT> resampledPositions 
+        = MathUtils::linearResample<vec3, METABALLS_PER_SEGMENT>(position, pos);
+
+    for (const vec3& resampledPos : resampledPositions) {
+        metaballs.emplace_back(Metaball{ resampledPos, vec3(1.0f, 1.0f, 1.0f), 0.1f });
+    }
+
+    // Update turtle state
     positionIndex = vertIndex;
+    position = pos;
 }

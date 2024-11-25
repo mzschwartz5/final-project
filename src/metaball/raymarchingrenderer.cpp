@@ -2,12 +2,17 @@
 
 bool RaymarchingRenderer::_instantiated = false;
 
-RaymarchingRenderer::RaymarchingRenderer(const vector<Metaball>& metaballs, Quad&& quad) :
-    metaballs(metaballs),
-    quad(std::move(quad)) {
-
+RaymarchingRenderer::RaymarchingRenderer() : quad(Shader("../src/shaders/fullscreen.vs", "../src/shaders/raymarch.fs")) {
     assert(!_instantiated);
     _instantiated = true;
+}
+
+RaymarchingRenderer::~RaymarchingRenderer() {
+    _instantiated = false;
+}
+
+void RaymarchingRenderer::setMetaballs(const vector<Metaball>& metaballs) {
+    numMetaballs = metaballs.size();
 
     // TODO: this has to be more dynamic, so that we can add and remove metaballs
     // Note: SSBOs are 16-byte aligned, so we have to pad the vec3s to vec4s
@@ -18,19 +23,15 @@ RaymarchingRenderer::RaymarchingRenderer(const vector<Metaball>& metaballs, Quad
     for (const Metaball& metaball : metaballs) {
         positions.push_back(vec4(metaball.getCenter(), 0.0f));
         scales.push_back(vec4(metaball.getScale(), 0.0f)); // TODO: can pack this with radius by just have 3 radii instead of scales and radius
-        radii.push_back(metaball.getRadius()); 
+        radii.push_back(metaball.getRadius());
     }
 
-    Mesh& quadMesh = this->quad.getMesh();
-    metaballPositionsBuffer = quadMesh.addSSBO(positions.data(), sizeof(vec4) * metaballs.size());
-    metaballScaleBuffer = quadMesh.addSSBO(scales.data(), sizeof(vec4) * metaballs.size());
-    metaballRadiiBuffer = quadMesh.addSSBO(radii.data(), sizeof(float) * metaballs.size());
+    // TODO: should use updateSSBO if already created
+    Mesh& quadMesh = quad.getMesh();
+    quadMesh.addSSBO(positions.data(), sizeof(vec4) * metaballs.size());
+    quadMesh.addSSBO(scales.data(), sizeof(vec4) * metaballs.size());
+    quadMesh.addSSBO(radii.data(), sizeof(float) * metaballs.size());
 }
-
-RaymarchingRenderer::~RaymarchingRenderer() {
-    _instantiated = false;
-}
-
 
 void RaymarchingRenderer::render(
     const mat4& viewMatrix,
@@ -48,7 +49,7 @@ void RaymarchingRenderer::render(
     shader.setValue("viewportOffset", viewportOffset);
     shader.setValue("nearPlaneDims", nearPlaneDims);
     shader.setValue("nearPlaneDist", nearPlaneDistance);
-    shader.setValue("numMetaballs", static_cast<int>(metaballs.size()));
+    shader.setValue("numMetaballs", numMetaballs);
 
     quad.draw();
 }

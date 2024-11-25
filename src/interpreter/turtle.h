@@ -3,9 +3,12 @@
 
 #include <glad/gl.h>
 #include <glm/glm.hpp>
+#include "mesh.h"
+#include "../metaball/metaball.h"
+#include "../metaball/raymarchingrenderer.h"
 using glm::vec3;
 using glm::mat4;
-#include "mesh.h"
+using std::vector;
 
 // This turtle draws the skeleton of the geometry.
 class Turtle {
@@ -32,14 +35,27 @@ public:
     float getPitch() const { return pitch; }
     unsigned int getPositionIndex() const { return positionIndex; }
     void setPositionIndex(unsigned int index) { positionIndex = index; }
-    void draw(const mat4& viewMatrix, const mat4& projectionMatrix);
+    void finalize();
+    void drawLines(const mat4& viewMatrix, const mat4& projectionMatrix);
+    void drawGeometry(
+        const mat4& viewMatrix, 
+        const vec2& viewportDims,
+        float viewportOffset,
+        const vec2& nearPlaneDims,
+        float nearPlaneDistance
+    );
 
 private:
     static bool _instantiated;
+    static constexpr int METABALLS_PER_SEGMENT = 2;
+    
+    RaymarchingRenderer raymarchingRenderer;
     vec3 position = vec3(0.0f, 0.0f, 0.0f);
     float pitch = 0.0f; // radians
     float yaw = 0.0f;   // radians
     unsigned int positionIndex;
     Mesh mesh;
+    // Geometry is made of metaballs
+    vector<Metaball> metaballs;
 };
 #endif

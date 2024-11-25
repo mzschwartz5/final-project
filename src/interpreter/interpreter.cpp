@@ -7,6 +7,8 @@ void Interpreter::run(const list<uPtr<Node>>& nodeList) {
     for (auto& node : nodeList) {
         node->evaluate(*this);
     }
+
+    turtle.finalize();
 }
 
 void Interpreter::push(float value) {

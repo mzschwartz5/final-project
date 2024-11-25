@@ -7,7 +7,7 @@ uniform vec2 viewportDims;
 uniform float viewportOffset;
 uniform vec2 nearPlaneDims;
 uniform float nearPlaneDist;
-uniform int numMetaballs;
+uniform uint numMetaballs;
 
 out vec4 FragColor;
 

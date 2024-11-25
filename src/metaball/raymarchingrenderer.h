@@ -14,8 +14,10 @@ using glm::vec2;
 
 class RaymarchingRenderer {
 public:
-    RaymarchingRenderer(const vector<Metaball>& metaballs, Quad&& quad);
+    RaymarchingRenderer();
     ~RaymarchingRenderer();
+
+    void setMetaballs(const vector<Metaball>& metaballs);
 
     void render(
         const mat4& viewMatrix, 
@@ -28,10 +30,10 @@ public:
 private:
     static bool _instantiated;
     static constexpr float ISOVALUE = 0.05f;
-    vector<Metaball> metaballs;
     unsigned int metaballPositionsBuffer;
     unsigned int metaballRadiiBuffer;
     unsigned int metaballScaleBuffer;
+    unsigned int numMetaballs = 0;
     Quad quad;
 };
 
