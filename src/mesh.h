@@ -18,6 +18,8 @@ public:
 	void addIndex(unsigned int index);
 	void setupMesh();
 	void setDrawMode(GLenum mode) { drawMode = mode; }
+	unsigned int addTexture(const char* texturePath);
+	void useTexture(unsigned int texture);
 	unsigned int addSSBO(const void* data, size_t size);
 	void updateSSBO(unsigned int SSBO, const void* data, size_t size);
 	void draw();
@@ -36,6 +38,7 @@ private:
 	// Render data (OpenGL objects)
 	unsigned int VAO, VBO, EBO;
 	vector<unsigned int> SSBOs;
+	vector<unsigned int> textures;
 	GLenum drawMode = GL_TRIANGLES;
 };
 

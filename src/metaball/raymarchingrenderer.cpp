@@ -43,12 +43,14 @@ void RaymarchingRenderer::render(
 
     Shader& shader = quad.getMesh().getShader();
     shader.use();
+    shader.setValue("viewMatrix", viewMatrix);
     shader.setValue("invViewMatrix", glm::inverse(viewMatrix));
     shader.setValue("viewportDims", viewportDims);
     shader.setValue("viewportOffset", viewportOffset);
     shader.setValue("nearPlaneDims", nearPlaneDims);
     shader.setValue("nearPlaneDist", nearPlaneDistance);
     shader.setValue("numMetaballs", numMetaballs);
+    shader.setValue("matcapTexture", GL_TEXTURE0);
 
     quad.draw();
 }

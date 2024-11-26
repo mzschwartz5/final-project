@@ -22,9 +22,12 @@ public:
             },
             shader
         )
-        {}
+        {
+            quadTexture = mesh.addTexture("../textures/red_wax.png");
+        }
 
     void draw() {
+        mesh.useTexture(quadTexture);
         mesh.draw();
     }
 
@@ -35,6 +38,7 @@ public:
 private:
     Shader shader;
     Mesh mesh;
+    unsigned int quadTexture;
 };
 
 #endif // QUAD_H

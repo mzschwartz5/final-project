@@ -1,12 +1,14 @@
 #version 430 core
 
 
+uniform mat4 viewMatrix;
 uniform mat4 invViewMatrix;
 uniform vec2 viewportDims;
 uniform float viewportOffset;
 uniform vec2 nearPlaneDims;
 uniform float nearPlaneDist;
 uniform uint numMetaballs;
+uniform sampler2D matcapTexture;
 
 out vec4 FragColor;
 
@@ -23,7 +25,6 @@ layout(std430, binding = 2) buffer MetaballRadii {
     float mbRadii[];
 };
 
-const vec3 lightDir = normalize(vec3(1.0f, 1.0f, 1.0f));
 const int MAX_STEPS = 50;
 const float MAX_STEP_SIZE = 1.0f;
 const float MIN_STEP_SIZE = 0.05f;
@@ -120,7 +121,6 @@ vec3 gradientAtPoint(in vec3 point) {
 
 void main()
 {
-
     vec2 fragCoord = gl_FragCoord.xy;
     vec2 scaledFragCoord = scaleFragCoord(fragCoord);
     vec3 rayDirectionCamSpace = vec3(scaledFragCoord, -nearPlaneDist);
@@ -130,14 +130,14 @@ void main()
     float field;
     float t = raymarch(cameraPos, rayDirection, field);
     if (t < 0.0f) {
-        FragColor = vec4(0.2f, 0.3f, 0.3f, 1.0);
+        FragColor = vec4(0.3, 0.3, 0.3, 1.0);
         return;
     }
 
     vec3 p = rayPosition(cameraPos, rayDirection, t);
     vec3 normal = gradientAtPoint(p);
 
-    // Simple diffuse lighting
-    float diff = max(dot(normal, lightDir), 0.0);
-    FragColor = vec4(diff, diff, diff, 1.0);
+    // Matcap shading
+    vec3 viewNormal = normalize(viewMatrix * vec4(normal, 0.0f)).xyz;
+    FragColor = texture(matcapTexture, viewNormal.xy * 0.5 + 0.5);
 }

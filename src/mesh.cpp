@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "camera.h"
 #include "constants.h"
+#include "stb_image.h"
 
 Mesh::Mesh(vector<Vertex>&& vertices, vector<unsigned int>&& indices, Shader shader)
 	: m_vertices(std::move(vertices)), m_indices(std::move(indices)), m_shader(shader) {
@@ -24,6 +25,10 @@ Mesh::~Mesh() {
 	for (unsigned int SSBO : SSBOs) {
 		glDeleteBuffers(1, &SSBO);
 	}
+
+	for (unsigned int texture : textures) {
+		glDeleteTextures(1, &texture);
+	}
 }
 
 /* For now, pass in matrices directly. In future, consider accessing differently */
@@ -42,6 +47,50 @@ void Mesh::draw() {
 	glBindVertexArray(0); // unbind
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind
 
+}
+
+unsigned int Mesh::addTexture(const char* texturePath) {
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // x-axis
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // y-axis
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load(texturePath, &width, &height, &nrChannels, 0);
+	if (data) {
+		GLenum format;
+		if (nrChannels == 1) {
+			format = GL_RED;
+		}
+		else if (nrChannels == 3) {
+			format = GL_RGB;
+		}
+		else if (nrChannels == 4) {
+			format = GL_RGBA;
+		}
+		else {
+			throw "Unsupported number of channels in texture";
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		throw "Failed to load texture";
+	}
+	stbi_image_free(data);
+
+	textures.push_back(texture);
+	return texture;
+}
+
+void Mesh::useTexture(unsigned int texture) {
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
 }
 
 unsigned int Mesh::addSSBO(const void* data, size_t size) {
