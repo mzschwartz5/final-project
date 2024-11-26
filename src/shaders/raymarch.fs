@@ -130,7 +130,7 @@ void main()
     float field;
     float t = raymarch(cameraPos, rayDirection, field);
     if (t < 0.0f) {
-        FragColor = vec4(0.3, 0.3, 0.3, 1.0);
+        FragColor = vec4(0.2, 0.2, 0.2, 1.0);
         return;
     }
 

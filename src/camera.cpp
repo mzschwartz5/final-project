@@ -88,8 +88,6 @@ const mat4& Camera::calcViewMatrix() {
 }
 
 const mat4& Camera::calcProjectionMatrix(const float width, const float height) {
-	screenHeight = height;
-	screenWidth = width;
 	projectionMatrix = glm::perspective(glm::radians(fov), width / height, nearPlane, farPlane);
 	return projectionMatrix;
 }

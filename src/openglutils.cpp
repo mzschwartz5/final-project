@@ -163,6 +163,9 @@ void SplitViewport::setViewportSplitRatio(double ratio) {
     viewports[Viewport::RIGHT][0] = static_cast<GLint>(Constants::SCR_WIDTH * viewportSplitRatio);
     viewports[Viewport::RIGHT][2] = static_cast<GLint>(Constants::SCR_WIDTH * (1.0f - viewportSplitRatio));
     viewports[Viewport::BORDER][0] = static_cast<GLint>(viewportSplitRatio * Constants::SCR_WIDTH - borderWidthPixels / 2);
+
+    cameras[Viewport::LEFT]->setScreenDims(viewports[Viewport::LEFT][2], viewports[Viewport::LEFT][3]);
+    cameras[Viewport::RIGHT]->setScreenDims(viewports[Viewport::RIGHT][2], viewports[Viewport::RIGHT][3]);
 }
 
 void SplitViewport::drawViewportBorder() {

@@ -34,8 +34,6 @@ int main() {
 		Turtle turtle;
 		Interpreter interpreter(turtle);
 		std::list<uPtr<Node>> nodeList;
-		nodeList.push_back(mkU<NumberNode>(0.0f));
-		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(4.0f));
 		nodeList.push_back(mkU<MoveNode>());
@@ -91,7 +89,7 @@ int main() {
 		// Draw images until told to explicitly stop (e.g. x out of window)
 		while (!glfwWindowShouldClose(window))
 		{
-			glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			// Render left viewport
 			splitViewport.setViewport(OpenGLUtils::Viewport::LEFT);
