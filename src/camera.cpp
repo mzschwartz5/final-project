@@ -6,7 +6,7 @@ Camera::Camera(const vec3& position, const vec3& front)
 {
 
 	cameraPos = position;
-	yaw = -90.0; // default camera to point down -z-axis
+	yaw = 90.0;
 	pitch = 0.0;
 	fov = 45.0;
 
@@ -26,7 +26,7 @@ const vec3& Camera::getCameraFront() const {
 	return cameraFront;
 }
 
-void Camera::setCameraFront(double xoffset, double yoffset) {
+void Camera::orbitCamera(double xoffset, double yoffset) {
 	const double sensitivity = 0.1f;
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
@@ -45,15 +45,15 @@ void Camera::setCameraFront(double xoffset, double yoffset) {
 void Camera::updateCameraVectors() {
 	glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	vec3 newFront;
-	newFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	newFront.y = sin(glm::radians(pitch));
-	newFront.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	// Given updated yaw and pitch, orbit the camera around the target
+	float orbitRadius = glm::length(cameraPos - orbitTarget);
+	cameraPos.x = orbitRadius * cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraPos.y = -orbitRadius * sin(glm::radians(pitch));
+	cameraPos.z = orbitRadius * sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
-	cameraFront = glm::normalize(newFront);
-	cameraRight = glm::normalize(glm::cross(worldUp, cameraFront));
-	cameraUp = glm::normalize(glm::cross(cameraFront, cameraRight));
-
+	cameraFront = glm::normalize(orbitTarget - cameraPos);
+	cameraRight = glm::normalize(glm::cross(cameraFront, worldUp));
+	cameraUp = glm::normalize(glm::cross(cameraRight, cameraFront));
 }
 
 const vec3& Camera::getCameraRight() const {

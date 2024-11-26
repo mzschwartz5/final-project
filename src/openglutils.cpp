@@ -104,7 +104,7 @@ void bindMouseInputsToWindow(GLFWwindow* window, MouseCallbackContext context) {
 
         // Only switch the current camera if we've let go of the mouse button.
         if (!currentCamera) currentCamera = splitViewport->getCamera(activeViewport);
-        currentCamera->setCameraFront(xoffset, yoffset);
+        currentCamera->orbitCamera(xoffset, yoffset);
     };
     glfwSetCursorPosCallback(window, mouseCallback); // register callback
 

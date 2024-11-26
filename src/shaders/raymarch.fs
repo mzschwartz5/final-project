@@ -24,7 +24,7 @@ layout(std430, binding = 2) buffer MetaballRadii {
 };
 
 const vec3 lightDir = normalize(vec3(1.0f, 1.0f, 1.0f));
-const int MAX_STEPS = 100;
+const int MAX_STEPS = 50;
 const float MAX_STEP_SIZE = 1.0f;
 const float MIN_STEP_SIZE = 0.05f;
 const float EPISILON = 0.001f;
@@ -96,20 +96,9 @@ float raymarch(in vec3 rayOrigin, in vec3 rayDirection, out float field) {
             return mix(lastT, t,  -lastField / (field - lastField));
         }
 
-        // Adaptive step size based on the difference between fields at the current and last step.
-        // Small difference -> take larger step, large difference -> take smaller step
-        float normFieldDiff = (field - lastField) / lastField;
-        if (normFieldDiff <= 0.01f) 
-        {
-            stepSize = min(stepSize * 2.0f, MAX_STEP_SIZE); 
-        }
-        else {
-            stepSize = max(stepSize * (1.0f - normFieldDiff), MIN_STEP_SIZE);
-        }
-
         lastT = t;
         lastField = field;
-        t += stepSize;
+        t += field; // Sphere tracing
     }
     return -1.0f;
 }

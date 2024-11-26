@@ -21,7 +21,7 @@ public:
 	const vec3& getCameraFront() const;
 	float getFov() const;
 	void setFov(float newFov);
-	void setCameraFront(double xoffset, double yoffset);
+	void orbitCamera(double xoffset, double yoffset);
 	float getNearPlane() const;
 	float getFarPlane() const;
 	vec2 getNearPlaneDims() const;
@@ -37,6 +37,7 @@ private:
 	vec3 cameraRight;
 	vec3 cameraUp;
 	vec3 cameraFront;
+	vec3 orbitTarget = vec3(0.0f, 0.0f, 0.0f);
 	double pitch;
 	double yaw;
 	float fov;
