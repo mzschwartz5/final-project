@@ -1,7 +1,6 @@
 #version 430 core
 
 
-uniform float isoValue;
 uniform mat4 invViewMatrix;
 uniform vec2 viewportDims;
 uniform float viewportOffset;
@@ -24,20 +23,42 @@ layout(std430, binding = 2) buffer MetaballRadii {
     float mbRadii[];
 };
 
-const vec3 lightDir = normalize(vec3(-1.0f, -1.0f, -1.0f));
+const vec3 lightDir = normalize(vec3(1.0f, 1.0f, 1.0f));
 const int MAX_STEPS = 100;
 const float MAX_STEP_SIZE = 1.0f;
 const float MIN_STEP_SIZE = 0.05f;
+const float EPISILON = 0.001f;
+const float K = 0.25f;
 
 float evaluateMetaballField(vec3 point, vec3 center, vec3 scale, float radius) {
-    vec3 difference = (point / scale) - center;
-    return radius * radius / dot(difference, difference);
+    point /= scale;
+    return length(point - center) - radius;
 }
 
 vec3 gradientMetaballField(vec3 point, vec3 center, vec3 scale, float radius) {
-    vec3 difference = (point / scale) - center;
-    float squaredDistance = dot(difference, difference);
-    return -2.0f * radius * radius * difference / (scale * squaredDistance * squaredDistance);
+    point /= scale;
+    // Gradient of the metaball field is the normalized vector from the point to the center
+    return (point - center) / radius;
+}
+
+// Quadratic smooth minimum function: IQ (https://iquilezles.org/articles/smin/)
+float smoothMin( float a, float b, float k)
+{
+    k *= 4.0;
+    float x = (b-a)/k;
+    float g = (x> 1.0) ? x :
+              (x<-1.0) ? 0.0 :
+              (x*(2.0+x)+1.0)/4.0;
+    return b - k * g;
+}
+
+// Also from IQ:
+vec4 smoothMinGradient (vec4 a, vec4 b, float k)
+{
+    float h = 0.5 - min(abs(a.x-b.x)/(8.0*k), 0.5);
+    float s = h*h*k;
+    return (a.x<b.x) ? vec4(a.x-s, mix(a.yzw,b.yzw,h)):
+                       vec4(b.x-s, mix(b.yzw,a.yzw,h));
 }
 
 vec3 rayPosition(in vec3 rayOrigin, in vec3 rayDirection, in float t) {
@@ -64,20 +85,20 @@ float raymarch(in vec3 rayOrigin, in vec3 rayDirection, out float field) {
 
     for (int i = 0; i < MAX_STEPS; ++i) {
         vec3 p = rayPosition(rayOrigin, rayDirection, t);
-        field = 0.0f;
+        field = evaluateMetaballField(p, mbPositions[0].xyz, mbScales[0].xyz, mbRadii[0]);
 
-        for (int j = 0; j < numMetaballs; j++) {
-            field += evaluateMetaballField(p, mbPositions[j].xyz, mbScales[j].xyz, mbRadii[j]);
+        for (int j = 1; j < numMetaballs; j++) {
+            field = smoothMin(field, evaluateMetaballField(p, mbPositions[j].xyz, mbScales[j].xyz, mbRadii[j]), K);
         }
 
-        if (field > isoValue) {
+        if (field <= EPISILON) {
             // Interpolate between the last and current t values to get a more accurate intersection point
-            return mix(lastT, t, (isoValue - lastField) / (field - lastField));
+            return mix(lastT, t,  -lastField / (field - lastField));
         }
 
-        // Adaptive step size based on the difference between fields at the current and last step
-        // normalized to the isovalue. Small difference -> take larger step, large difference -> take smaller step
-        float normFieldDiff = (field - lastField) / isoValue;
+        // Adaptive step size based on the difference between fields at the current and last step.
+        // Small difference -> take larger step, large difference -> take smaller step
+        float normFieldDiff = (field - lastField) / lastField;
         if (normFieldDiff <= 0.01f) 
         {
             stepSize = min(stepSize * 2.0f, MAX_STEP_SIZE); 
@@ -94,15 +115,23 @@ float raymarch(in vec3 rayOrigin, in vec3 rayDirection, out float field) {
 }
 
 vec3 gradientAtPoint(in vec3 point) {
-    vec3 gradient = vec3(0.0f);
-    for (int i = 0; i < numMetaballs; i++) {
-        gradient += gradientMetaballField(point, mbPositions[i].xyz, mbScales[i].xyz, mbRadii[i]);
+    vec3 gradient = gradientMetaballField(point, mbPositions[0].xyz, mbScales[0].xyz, mbRadii[0]);
+    float field = evaluateMetaballField(point, mbPositions[0].xyz, mbScales[0].xyz, mbRadii[0]);
+
+    for (int i = 1; i < numMetaballs; i++) {
+        vec3 newGradient = gradientMetaballField(point, mbPositions[i].xyz, mbScales[i].xyz, mbRadii[i]);
+        float newField = evaluateMetaballField(point, mbPositions[i].xyz, mbScales[i].xyz, mbRadii[i]);
+        vec4 gradAndField = smoothMinGradient(vec4(field, gradient), vec4(newField, newGradient), K);
+        gradient = gradAndField.yzw;
+        field = gradAndField.x;
     }
+
     return normalize(gradient);
 }
 
 void main()
 {
+
     vec2 fragCoord = gl_FragCoord.xy;
     vec2 scaledFragCoord = scaleFragCoord(fragCoord);
     vec3 rayDirectionCamSpace = vec3(scaledFragCoord, -nearPlaneDist);

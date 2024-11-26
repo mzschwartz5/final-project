@@ -47,7 +47,7 @@ public:
 
 private:
     static bool _instantiated;
-    static constexpr int METABALLS_PER_SEGMENT = 2;
+    static constexpr int METABALLS_PER_SEGMENT = 4;
     
     RaymarchingRenderer raymarchingRenderer;
     vec3 position = vec3(0.0f, 0.0f, 0.0f);

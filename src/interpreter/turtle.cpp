@@ -71,7 +71,7 @@ void Turtle::setPosition(const vec3& pos, bool draw) {
         = MathUtils::linearResample<vec3, METABALLS_PER_SEGMENT>(position, pos);
 
     for (const vec3& resampledPos : resampledPositions) {
-        metaballs.emplace_back(Metaball{ resampledPos, vec3(1.0f, 1.0f, 1.0f), 0.1f });
+        metaballs.emplace_back(Metaball{ resampledPos, vec3(1.0f, 1.0f, 1.0f), 0.5f });
     }
 
     // Update turtle state

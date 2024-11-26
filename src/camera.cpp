@@ -107,8 +107,7 @@ vec2 Camera::getScreenDims() const {
 }
 
 vec2 Camera::getNearPlaneDims() const {
-    float aspectRatio = screenWidth / screenHeight;
-    float nearPlaneHeight = 2.0f * tan(glm::radians(fov / 2.0f));
-    float nearPlaneWidth = nearPlaneHeight * aspectRatio;
+	float nearPlaneHeight = 2.0f * nearPlane * tan(glm::radians(fov) / 2.0f);
+	float nearPlaneWidth = nearPlaneHeight * (screenWidth / screenHeight);
     return vec2(nearPlaneWidth, nearPlaneHeight);
 }

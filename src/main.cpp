@@ -34,50 +34,52 @@ int main() {
 		Turtle turtle;
 		Interpreter interpreter(turtle);
 		std::list<uPtr<Node>> nodeList;
+		nodeList.push_back(mkU<NumberNode>(0.0f));
+		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f));
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f));
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f));
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f));
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f));
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f));
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f));
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(5.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f));
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
@@ -98,6 +100,7 @@ int main() {
 			splitViewport.setViewport(OpenGLUtils::Viewport::RIGHT);
 			turtle.drawGeometry(
 				cameraRight.calcViewMatrix(),
+				cameraRight.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)),
 				glm::vec2(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)),
 				splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT),
 				cameraRight.getNearPlaneDims(),

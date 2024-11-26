@@ -21,7 +21,7 @@ namespace MathUtils {
     std::array<T, N> linearResample(const T& start, const T& end) {
         std::array<T, N> resampled;
         for (int i = 0; i < N; i++) {
-            resampled[i] = start + (end - start) * static_cast<float>(i) / static_cast<float>(N);
+            resampled[i] = start + (end - start) * static_cast<float>(i + 1) / static_cast<float>(N);
         }
         return resampled;
     }

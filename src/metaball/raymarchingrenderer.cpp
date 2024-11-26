@@ -43,7 +43,6 @@ void RaymarchingRenderer::render(
 
     Shader& shader = quad.getMesh().getShader();
     shader.use();
-    shader.setValue("isoValue", ISOVALUE);
     shader.setValue("invViewMatrix", glm::inverse(viewMatrix));
     shader.setValue("viewportDims", viewportDims);
     shader.setValue("viewportOffset", viewportOffset);
