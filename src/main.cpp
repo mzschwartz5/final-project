@@ -100,7 +100,6 @@ int main() {
 			splitViewport.setViewport(OpenGLUtils::Viewport::RIGHT);
 			turtle.drawGeometry(
 				cameraRight.calcViewMatrix(),
-				cameraRight.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)),
 				glm::vec2(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)),
 				splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT),
 				cameraRight.getNearPlaneDims(),
