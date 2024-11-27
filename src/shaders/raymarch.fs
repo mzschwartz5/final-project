@@ -25,11 +25,11 @@ layout(std430, binding = 2) buffer MetaballRadii {
     float mbRadii[];
 };
 
-const int MAX_STEPS = 50;
+const int MAX_STEPS = 100;
 const float MAX_STEP_SIZE = 1.0f;
 const float MIN_STEP_SIZE = 0.05f;
 const float EPISILON = 0.001f;
-const float K = 0.25f;
+const float K = 0.1f;
 
 float evaluateMetaballField(vec3 point, vec3 center, vec3 scale, float radius) {
     point /= scale;

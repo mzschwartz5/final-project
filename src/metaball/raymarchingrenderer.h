@@ -29,7 +29,6 @@ public:
 
 private:
     static bool _instantiated;
-    static constexpr float ISOVALUE = 0.05f;
     unsigned int metaballPositionsBuffer;
     unsigned int metaballRadiiBuffer;
     unsigned int metaballScaleBuffer;

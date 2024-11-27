@@ -8,4 +8,5 @@ void StoreTransformNode::evaluate(Interpreter& interpreter) {
     interpreter.push(turtle.getPosition().y);
     interpreter.push(turtle.getPosition().x);
     interpreter.push(turtle.getPositionIndex());
+    interpreter.push(turtle.getScale());
 }

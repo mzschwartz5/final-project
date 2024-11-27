@@ -27,14 +27,17 @@ public:
     }
 
     void move(float distance, bool draw = true);
+    void move(float distance, float scale, bool draw = true);
     void rotate(float yaw, float pitch);
-    void setPosition(const vec3& pos, bool draw = true);
+    void setState(const vec3& pos, float scale = 1.0f, bool draw = true);
     const vec3& getPosition() const { return position; }
     void setRotation(float yaw, float pitch) { this->yaw = yaw; this->pitch = pitch; }
     float getYaw() const { return yaw; }
     float getPitch() const { return pitch; }
     unsigned int getPositionIndex() const { return positionIndex; }
     void setPositionIndex(unsigned int index) { positionIndex = index; }
+    float getScale() const { return scale; }
+
     void finalize();
     void drawLines(const mat4& viewMatrix, const mat4& projectionMatrix);
     void drawGeometry(
@@ -47,10 +50,11 @@ public:
 
 private:
     static bool _instantiated;
-    static constexpr int METABALLS_PER_SEGMENT = 4;
+    static constexpr int METABALLS_PER_SEGMENT = 10;
     
     RaymarchingRenderer raymarchingRenderer;
     vec3 position = vec3(0.0f, 0.0f, 0.0f);
+    float scale = 1.0f;
     float pitch = 0.0f; // radians
     float yaw = 0.0f;   // radians
     unsigned int positionIndex;

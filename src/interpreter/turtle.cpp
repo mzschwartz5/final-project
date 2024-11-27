@@ -38,26 +38,31 @@ void Turtle::rotate(float yaw, float pitch) {
     this->pitch += pitch;
 }
 
-void Turtle::move(float distance, bool draw) {
+void Turtle::move(float distance, float scale, bool draw) {
     vec3 newPos = position + vec3(
         distance * cos(yaw) * cos(pitch),
         distance * sin(yaw) * cos(pitch),
         distance * sin(pitch)
     );
 
-    setPosition(newPos, draw);
+    setState(newPos, scale, draw);
 }
 
-void Turtle::setPosition(const vec3& pos, bool draw) {
+void Turtle::move(float distance, bool draw) {
+    move(distance, scale, draw);
+}
+
+void Turtle::setState(const vec3& newPos, float newScale, bool draw) {
     if (!draw) {
-        position = pos;
+        position = newPos;
+        scale = newScale;
         return;
     }
 
     // Add vertices for drawing turtle lines
     unsigned int vertIndex = mesh.addVertex(
         Vertex(
-            pos,
+            newPos,
             vec3(0.0f, 0.0f, 0.0f), // normal (hardcoded for now)
             vec2(0.0f, 0.0f)        // texture coordinates (hardcoded for now)
         )
@@ -68,13 +73,13 @@ void Turtle::setPosition(const vec3& pos, bool draw) {
 
     // Add metaballs for rendering 3D geometry
     std::array<vec3, METABALLS_PER_SEGMENT> resampledPositions 
-        = MathUtils::linearResample<vec3, METABALLS_PER_SEGMENT>(position, pos);
+        = MathUtils::linearResample<vec3, METABALLS_PER_SEGMENT>(position, newPos);
 
-    for (const vec3& resampledPos : resampledPositions) {
-        metaballs.emplace_back(Metaball{ resampledPos, vec3(1.0f, 1.0f, 1.0f), 0.5f });
-    }
+    std::array<vec3, METABALLS_PER_SEGMENT> resampledScales
+        = MathUtils::linearResample<vec3, METABALLS_PER_SEGMENT>(vec3(scale), vec3(newScale));
 
     // Update turtle state
     positionIndex = vertIndex;
-    position = pos;
+    position = newPos;
+    scale = newScale;
 }

@@ -28,9 +28,9 @@ void RaymarchingRenderer::setMetaballs(const vector<Metaball>& metaballs) {
 
     // TODO: should use updateSSBO if already created
     Mesh& quadMesh = quad.getMesh();
-    quadMesh.addSSBO(positions.data(), sizeof(vec4) * metaballs.size());
-    quadMesh.addSSBO(scales.data(), sizeof(vec4) * metaballs.size());
-    quadMesh.addSSBO(radii.data(), sizeof(float) * metaballs.size());
+    metaballPositionsBuffer = quadMesh.addSSBO(positions.data(), sizeof(vec4) * metaballs.size());
+    metaballScaleBuffer = quadMesh.addSSBO(scales.data(), sizeof(vec4) * metaballs.size());
+    metaballRadiiBuffer = quadMesh.addSSBO(radii.data(), sizeof(float) * metaballs.size());
 }
 
 void RaymarchingRenderer::render(
