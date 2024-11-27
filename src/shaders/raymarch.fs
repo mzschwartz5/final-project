@@ -31,15 +31,22 @@ const float MIN_STEP_SIZE = 0.05f;
 const float EPISILON = 0.001f;
 const float K = 0.1f;
 
+// Ellipsoid SDF: https://www.shadertoy.com/view/tdS3DG
 float evaluateMetaballField(vec3 point, vec3 center, vec3 scale, float radius) {
-    point /= scale;
-    return length(point - center) - radius;
+    vec3 scaledRadius = radius * scale;
+    float k0 = length((point - center) / scaledRadius);
+    float k1 = length((point - center) / (scaledRadius * scaledRadius));
+    return k0 * ( k0 - 1.0) / k1;
 }
 
 vec3 gradientMetaballField(vec3 point, vec3 center, vec3 scale, float radius) {
-    point /= scale;
-    // Gradient of the metaball field is the normalized vector from the point to the center
-    return (point - center) / radius;
+    // Since the ellipsoid SDF is bound (not exact), to get the gradient, we need to take multiple samples of the SDF.
+    vec2 e = vec2(1.0,-1.0)*0.0005;
+    return normalize( e.xyy*evaluateMetaballField( point + e.xyy, center, scale, radius ) + 
+					  e.yyx*evaluateMetaballField( point + e.yyx, center, scale, radius ) + 
+					  e.yxy*evaluateMetaballField( point + e.yxy, center, scale, radius ) + 
+					  e.xxx*evaluateMetaballField( point + e.xxx, center, scale, radius ) );
+
 }
 
 // Quadratic smooth minimum function: IQ (https://iquilezles.org/articles/smin/)
@@ -81,7 +88,7 @@ vec2 scaleFragCoord(in vec2 fragCoord) {
 float raymarch(in vec3 rayOrigin, in vec3 rayDirection, out float field) {
     float t = 0.0f;
     float lastT = 0.0f;
-    float stepSize = 0.1f;
+    float stepSize = 0.0f;
     float lastField = 0.0f;
 
     for (int i = 0; i < MAX_STEPS; ++i) {
