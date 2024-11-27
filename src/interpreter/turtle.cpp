@@ -78,6 +78,10 @@ void Turtle::setState(const vec3& newPos, float newScale, bool draw) {
     std::array<vec3, METABALLS_PER_SEGMENT> resampledScales
         = MathUtils::linearResample<vec3, METABALLS_PER_SEGMENT>(vec3(scale), vec3(newScale));
 
+    for (int i = 0; i < METABALLS_PER_SEGMENT; i++) {
+        metaballs.emplace_back(Metaball{ resampledPositions[i], vec3(resampledScales[i]), 0.5f });
+    }
+
     // Update turtle state
     positionIndex = vertIndex;
     position = newPos;
