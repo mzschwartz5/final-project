@@ -5,9 +5,11 @@ void MoveNode::evaluate(Interpreter& interpreter) {
 
     if (numArgs == 1) { // Simple move
         interpreter.getTurtle().move(interpreter.pop());
-    } else { // Move and scale, 2 args
-        float scale = interpreter.pop();
+    } else { // Move and scale, 4 args (distance, scale x, scale y, scale z)
+        float scaleX = interpreter.pop();
+        float scaleY = interpreter.pop();
+        float scaleZ = interpreter.pop();
         float distance = interpreter.pop();
-        interpreter.getTurtle().move(distance, scale);
+        interpreter.getTurtle().move(distance, glm::vec3{scaleX, scaleY, scaleZ});
     }
 }

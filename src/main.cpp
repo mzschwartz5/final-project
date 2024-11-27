@@ -34,50 +34,83 @@ int main() {
 		Turtle turtle;
 		Interpreter interpreter(turtle);
 		std::list<uPtr<Node>> nodeList;
+
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(4.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // distance
+		nodeList.push_back(mkU<NumberNode>(0.2f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // number of args
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(4.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // distance
+		nodeList.push_back(mkU<NumberNode>(0.2f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // number of args
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(4.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // distance
+		nodeList.push_back(mkU<NumberNode>(0.2f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // number of args
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(4.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // distance
+		nodeList.push_back(mkU<NumberNode>(0.2f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // number of args
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(4.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // distance
+		nodeList.push_back(mkU<NumberNode>(0.2f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // number of args
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(4.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // distance
+		nodeList.push_back(mkU<NumberNode>(0.2f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // number of args
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(4.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // distance
+		nodeList.push_back(mkU<NumberNode>(0.2f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // number of args
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));
 		nodeList.push_back(mkU<YawNode>());
 		nodeList.push_back(mkU<StoreTransformNode>());
-		nodeList.push_back(mkU<NumberNode>(4.0f));
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // distance
+		nodeList.push_back(mkU<NumberNode>(0.2f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(2.0f)); // scale
+		nodeList.push_back(mkU<NumberNode>(4.0f)); // number of args
 		nodeList.push_back(mkU<MoveNode>());
 		nodeList.push_back(mkU<RestoreTransformNode>());
 		nodeList.push_back(mkU<NumberNode>(M_PI / 4.0f));

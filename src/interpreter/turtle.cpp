@@ -38,7 +38,7 @@ void Turtle::rotate(float yaw, float pitch) {
     this->pitch += pitch;
 }
 
-void Turtle::move(float distance, float scale, bool draw) {
+void Turtle::move(float distance, const vec3& scale, bool draw) {
     vec3 newPos = position + vec3(
         distance * cos(yaw) * cos(pitch),
         distance * sin(yaw) * cos(pitch),
@@ -52,7 +52,7 @@ void Turtle::move(float distance, bool draw) {
     move(distance, scale, draw);
 }
 
-void Turtle::setState(const vec3& newPos, float newScale, bool draw) {
+void Turtle::setState(const vec3& newPos, const vec3& newScale, bool draw) {
     if (!draw) {
         position = newPos;
         scale = newScale;
@@ -76,7 +76,7 @@ void Turtle::setState(const vec3& newPos, float newScale, bool draw) {
         = MathUtils::linearResample<vec3, METABALLS_PER_SEGMENT>(position, newPos);
 
     std::array<vec3, METABALLS_PER_SEGMENT> resampledScales
-        = MathUtils::linearResample<vec3, METABALLS_PER_SEGMENT>(vec3(scale), vec3(newScale));
+        = MathUtils::biasResample<vec3, METABALLS_PER_SEGMENT>(scale, newScale, 0.01f);
 
     for (int i = 0; i < METABALLS_PER_SEGMENT; i++) {
         metaballs.emplace_back(Metaball{ resampledPositions[i], vec3(resampledScales[i]), 0.5f });

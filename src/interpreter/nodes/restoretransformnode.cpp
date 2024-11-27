@@ -3,7 +3,9 @@
 void RestoreTransformNode::evaluate(Interpreter& interpreter) {
     Turtle& turtle = interpreter.getTurtle();
 
-    float scale = interpreter.pop();
+    float scaleX = interpreter.pop();
+    float scaleY = interpreter.pop();
+    float scaleZ = interpreter.pop();
     turtle.setPositionIndex(interpreter.pop());
 
     // Note: for functiosn with multiple arguments that need to be popped off the interpreter's stack,
@@ -11,7 +13,7 @@ void RestoreTransformNode::evaluate(Interpreter& interpreter) {
     float x = interpreter.pop();
     float y = interpreter.pop();
     float z = interpreter.pop();
-    turtle.setState(glm::vec3{x, y, z}, scale, false);
+    turtle.setState(glm::vec3{x, y, z}, glm::vec3{scaleX, scaleY, scaleZ}, false);
 
     float yaw = interpreter.pop();
     float pitch = interpreter.pop();

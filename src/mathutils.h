@@ -25,6 +25,27 @@ namespace MathUtils {
         }
         return resampled;
     }
+
+
+    /**
+     * @param start The starting point of the line segment
+     * @param end The ending point of the line segment
+     * @param bias The bias factor for resampling
+     * @param N The number of points to resample
+     * 
+     * @return An array of N points resampled between start and end with a bias factor
+     */
+    template <typename T, std::size_t N>
+    std::array<T, N> biasResample(const T& start, const T& end, float bias) {
+        assert(bias >= 0.0f && bias <= 1.0f);
+        std::array<T, N> resampled;
+        for (int i = 0; i < N; i++) {
+            resampled[i] = start + (end - start) * static_cast<float>(pow(static_cast<float>(i + 1) / static_cast<float>(N), log(bias)/log(0.5f)));
+        }
+        return resampled;
+
+    }
+
 }
 
 #endif
