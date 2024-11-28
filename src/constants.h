@@ -12,6 +12,7 @@ namespace Constants {
 	inline constexpr dvec3 ORIGIN{0.0, 0.0, 0.0};
 	inline const string VIEW_MATRIX = "view";
 	inline const string PROJECTION_MATRIX = "projection";
+	inline const string MODEL_MATRIX = "model";
 }
 
 #endif

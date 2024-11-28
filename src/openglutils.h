@@ -27,6 +27,8 @@ public:
     Viewport getActiveViewport(double cursorPosX) const;
     GLint getViewportWidth(Viewport viewPort) const { return viewports.at(viewPort)[2]; }
     GLint getViewportHeight(Viewport viewPort) const { return viewports.at(viewPort)[3]; }
+    int getBorderWidthPixels() const { return borderWidthPixels; }
+    int getBorderWidthBuffer() const { return borderWidthBuffer; }
     Camera* getCamera(Viewport viewPort) {
         return cameras[viewPort];
     }

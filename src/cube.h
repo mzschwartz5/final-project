@@ -1,6 +1,7 @@
 #ifndef CUBE_H
 #define CUBE_H
 
+#include "constants.h"
 #include "mesh.h"
 #include "vertex.h"
 #include <vector>
@@ -55,17 +56,25 @@ vector<unsigned int> cubeIndices = {
 
 class Cube {
 public:
-    Cube() : m_mesh(std::move(cubeVertices), std::move(cubeIndices), Shader("../src/shaders/vertShader.vs", "../src/shaders/fragShader.fs"))
+    Cube(const vec3& position, const vec3& scale) 
+		: m_mesh(std::move(cubeVertices), std::move(cubeIndices), Shader("../src/shaders/vertShader.vs", "../src/shaders/fragShader.fs"))
     {
+		m_modelMatrix = glm::translate(m_modelMatrix, position);
+		m_modelMatrix = glm::scale(m_modelMatrix, scale);
     }
 
-    void draw() {
-        m_mesh.draw();
+    void draw(const mat4& viewMatrix, const mat4& projectionMatrix) {
+		Shader& shader = m_mesh.getShader();
+		shader.use();
+		shader.setValue(Constants::VIEW_MATRIX, viewMatrix);
+		shader.setValue(Constants::PROJECTION_MATRIX, projectionMatrix);
+		shader.setValue(Constants::MODEL_MATRIX, m_modelMatrix);
+		m_mesh.draw();
     }
 
 private:
     Mesh m_mesh;
-
+	mat4 m_modelMatrix = mat4(1.0f);
 };
 
 #endif

@@ -65,11 +65,17 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/stb/stb_image.h")
     message(FATAL_ERROR "The STB submodule was not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/imgui/imgui.h")
+    message(FATAL_ERROR "The IMGUI submodule was not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+endif()
+
 # Include directories for header files
 target_include_directories(Spliced PRIVATE ${CMAKE_SOURCE_DIR}/src
                                             ${CMAKE_SOURCE_DIR}/external/glm
                                             ${CMAKE_SOURCE_DIR}/external/stb
-                                            ${CMAKE_SOURCE_DIR}/includes
+                                            ${CMAKE_SOURCE_DIR}/external/imgui
+                                            ${CMAKE_SOURCE_DIR}/external/imgui/backends
+                                            ${CMAKE_SOURCE_DIR}/includes/imnodes
                                             # Glad builds its include folder to the build directory
                                             ${CMAKE_BINARY_DIR}/gladsources/glad/include/glad)
 
@@ -79,6 +85,21 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/external/glad/cmake)
 
 # Function defined in glad cmake file
 glad_add_library(glad STATIC API gl:core=4.3)
+
+# Add IMGUI source files
+set(IMGUI_SOURCES
+    ${CMAKE_SOURCE_DIR}/external/imgui/imgui.cpp
+    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_demo.cpp
+    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_draw.cpp
+    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_tables.cpp
+    ${CMAKE_SOURCE_DIR}/external/imgui/imgui_widgets.cpp
+    ${CMAKE_SOURCE_DIR}/external/imgui/backends/imgui_impl_opengl3.cpp
+    ${CMAKE_SOURCE_DIR}/external/imgui/backends/imgui_impl_glfw.cpp
+    # And include imnodes sources here too
+    ${CMAKE_SOURCE_DIR}/includes/imnodes/imnodes.cpp
+)
+
+target_sources(Spliced PRIVATE ${IMGUI_SOURCES})
 
 # Link libraries
 target_link_libraries(Spliced glfw glad ${CMAKE_DL_LIBS})
