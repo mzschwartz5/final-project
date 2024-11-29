@@ -37,12 +37,8 @@ int main() {
 		OpenGLUtils::bindMouseInputsToWindow(window, context);
 		stbi_set_flip_vertically_on_load(true); // global setting for STB image loader
 
-		Cube cube(Constants::ORIGIN, vec3(1.0f, 1.0f, 1.0f));
 		Turtle turtle;
 		Interpreter interpreter(turtle);
-		std::list<uPtr<Node>> nodeList;
-
-		interpreter.run(nodeList);
 
 		NodeEditor nodeEditor;
 		nodeEditor.init(window);
@@ -51,7 +47,10 @@ int main() {
 		// Draw images until told to explicitly stop (e.g. x out of window)
 		while (!glfwWindowShouldClose(window))
 		{
-			
+			if (nodeEditor.isDirty()) {
+				interpreter.run(nodeEditor.getNodeList());
+			}
+
 			nodeEditor.reset();
 			
 			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -59,10 +58,6 @@ int main() {
 			// Render left viewport
 			splitViewport.setViewport(OpenGLUtils::Viewport::LEFT);
 			turtle.drawLines(cameraLeft.calcViewMatrix(), cameraLeft.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::LEFT)));
-			cube.draw(
-				cameraLeft.calcViewMatrix(),
-				cameraLeft.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::LEFT))
-			);
 
 			// Render right viewport
 			splitViewport.setViewport(OpenGLUtils::Viewport::RIGHT);

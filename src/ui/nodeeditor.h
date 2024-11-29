@@ -6,13 +6,32 @@
 #include <list>
 #include "../interpreter/nodes/node.h"
 #include <unordered_map>
+#include "macros.h"
+#include <string>
 using std::list;
 using std::unordered_map;
+using std::string;
+
+enum class NodeType {
+    MOVE,
+    RESTORE,
+    STORE,
+};
 
 struct UINode {
+    NodeType type;
+    string name;
     int id;
     int inpinId;
     int outpinId;
+};
+
+// Factory class to create application nodes from UI nodes
+class NodeTranslator {
+public:
+    NodeTranslator() = default;
+    ~NodeTranslator() = default;
+    list<uPtr<Node>> translate(list<UINode> nodeList);
 };
 
 class NodeEditor {
@@ -29,11 +48,15 @@ public:
         int editorWidth,
         int editorHeight
     );
-    int getNewId();
-    void addNode();
-    void maybeChangeNodeMenuState();
+    list<uPtr<Node>> getNodeList() { return translator.translate(nodeList); }
+    bool isDirty() { return dirty; }
 
 private:
+    int getNewId();
+    void addNode(NodeType nodeType, const string& name);
+    void maybeChangeNodeMenuState();
+    NodeTranslator translator;
+    bool dirty = false;
     int uniqueId = 0;
     list<UINode> nodeList;
     unordered_map<int, list<UINode>::iterator> nodeIdMap;

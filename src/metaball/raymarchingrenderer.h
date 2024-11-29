@@ -18,6 +18,7 @@ public:
     ~RaymarchingRenderer();
 
     void setMetaballs(const vector<Metaball>& metaballs);
+    void reset();
 
     void render(
         const mat4& viewMatrix, 

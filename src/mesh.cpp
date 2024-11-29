@@ -109,6 +109,16 @@ void Mesh::updateSSBO(unsigned int SSBO, const void* data, size_t size) {
 	glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_STATIC_DRAW);
 }
 
+void Mesh::reset() {
+	m_vertices.clear();
+	m_indices.clear();
+	for (unsigned int SSBO : SSBOs) {
+		glDeleteBuffers(1, &SSBO);
+	}
+	SSBOs.clear();
+	dirty = true;
+}
+
 unsigned int Mesh::addVertex(Vertex&& vertex) {
 	m_vertices.push_back(vertex);
 	dirty = true;

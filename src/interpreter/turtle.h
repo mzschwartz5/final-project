@@ -39,6 +39,7 @@ public:
     const vec3& getScale() const { return scale; }
 
     void finalize();
+    void reset();
     void drawLines(const mat4& viewMatrix, const mat4& projectionMatrix);
     void drawGeometry(
         const mat4& viewMatrix, 

@@ -4,10 +4,12 @@
 bool Interpreter::_instantiated = false;
 
 void Interpreter::run(const list<uPtr<Node>>& nodeList) {
+    turtle.reset();
+
     for (auto& node : nodeList) {
         node->evaluate(*this);
     }
-
+    
     turtle.finalize();
 }
 

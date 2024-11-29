@@ -23,6 +23,7 @@ public:
 	unsigned int addSSBO(const void* data, size_t size);
 	void updateSSBO(unsigned int SSBO, const void* data, size_t size);
 	void draw();
+	void reset();
 	Shader& getShader() { return m_shader; }
 
 private:

@@ -36,16 +36,17 @@ int NodeEditor::getNewId() {
     return uniqueId++;
 }
 
-void NodeEditor::addNode() {
+void NodeEditor::addNode(NodeType nodeType, const string& name) {
     int nodeId = getNewId();
     ImNodes::SetNodeScreenSpacePos(nodeId, ImGui::GetMousePos());
-    auto it = nodeList.insert(nodeList.end(), {nodeId, getNewId(), getNewId()});
+    auto it = nodeList.insert(nodeList.end(), {nodeType, name, nodeId, getNewId(), getNewId()});
     nodeIdMap[nodeId] = it;
+    dirty = true;
 }
 
 void NodeEditor::maybeChangeNodeMenuState() {
     const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
-                            ImNodes::IsEditorHovered() && ImGui::IsKeyReleased(ImGuiKey_A);
+                            ImNodes::IsEditorHovered() && ImGui::IsKeyReleased(ImGuiKey_Tab);
 
     if (!ImGui::IsAnyItemHovered() && open_popup)
     {
@@ -54,9 +55,16 @@ void NodeEditor::maybeChangeNodeMenuState() {
 
     if (ImGui::BeginPopup("Add Node"))
     {
-        if (ImGui::MenuItem("add")) {
-            addNode();
+        if (ImGui::MenuItem("Move")) {
+            addNode(NodeType::MOVE, "Move");
         }
+        else if (ImGui::MenuItem("Restore")) {
+            addNode(NodeType::RESTORE, "Restore");
+        }
+        else if (ImGui::MenuItem("Store")) {
+            addNode(NodeType::STORE, "Store");
+        }
+        
         ImGui::EndPopup();
     }
 }
@@ -78,7 +86,7 @@ void NodeEditor::show(
     for (auto& node : nodeList) {
         ImNodes::BeginNode(node.id);
         ImNodes::BeginNodeTitleBar();
-        ImGui::Text("Node %d", node.id);
+        ImGui::Text("%s", node.name.c_str());
         ImNodes::EndNodeTitleBar();
         ImNodes::BeginInputAttribute(node.inpinId + 1);
         ImGui::Text("input pin");
@@ -93,4 +101,10 @@ void NodeEditor::show(
     ImGui::End();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    dirty = false;
+}
+
+list<uPtr<Node>> NodeTranslator::translate(list<UINode> uiNodeList) {
+    return {};
 }

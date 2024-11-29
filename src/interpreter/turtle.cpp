@@ -33,6 +33,17 @@ void Turtle::finalize() {
     raymarchingRenderer.setMetaballs(metaballs);
 }
 
+void Turtle::reset() {
+    position = vec3(0.0f, 0.0f, 0.0f);
+    scale = vec3(1.0f, 1.0f, 1.0f);
+    pitch = 0.0f;
+    yaw = 0.0f;
+    positionIndex = 0;
+    metaballs.clear();
+    raymarchingRenderer.reset();
+    mesh.reset();
+}
+
 void Turtle::rotate(float yaw, float pitch) {
     this->yaw += yaw;
     this->pitch += pitch;

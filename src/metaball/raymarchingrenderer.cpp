@@ -33,6 +33,14 @@ void RaymarchingRenderer::setMetaballs(const vector<Metaball>& metaballs) {
     metaballRadiiBuffer = quadMesh.addSSBO(radii.data(), sizeof(float) * metaballs.size());
 }
 
+void RaymarchingRenderer::reset() {
+    numMetaballs = 0;
+    metaballPositionsBuffer = 0;
+    metaballRadiiBuffer = 0;
+    metaballScaleBuffer = 0;
+    quad.getMesh().reset();
+}
+
 void RaymarchingRenderer::render(
     const mat4& viewMatrix,
     const vec2& viewportDims,
