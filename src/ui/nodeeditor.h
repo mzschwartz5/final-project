@@ -9,6 +9,7 @@
 #include "macros.h"
 #include <string>
 #include "uinode.h"
+#include "beginuinode.h"
 using std::list;
 using std::unordered_map;
 using std::string;
@@ -17,12 +18,14 @@ struct Link {
     int id;
     int startPinId;
     int endPinId;
+    int startNodeId;
+    int endNodeId;
 };
 
 class NodeEditor {
 
 public:
-    NodeEditor() = default;
+    NodeEditor();
     ~NodeEditor() = default;
     void init(GLFWwindow* window);
     void reset();
@@ -46,8 +49,9 @@ private:
     bool maybeAddLink();
     bool shouldDeleteLink(int linkId);
     void deleteLink(int linkId);
-    bool dirty = false;
+    int beginNodeId;
     int uniqueId = 0;
+    bool dirty = false;
     list<uPtr<UINode>> nodeList;
     list<Link> linkList;
     unordered_map<int, list<uPtr<UINode>>::iterator> nodeIdMap;

@@ -17,6 +17,10 @@ public:
     int getId() const { return id; }
     int getStartPinId() const { return startPinId; }
     int getEndPinId() const { return endPinId; }
+    void setInLinkId(int inLinkId) { this->inLinkId = inLinkId; }
+    void setOutLinkId(int outLinkId) { this->outLinkId = outLinkId; }
+    int getInLinkId() const { return inLinkId; }
+    int getOutLinkId() const { return outLinkId; }
     string getName() const { return name; }
     virtual list<uPtr<Node>> toInterpreterNodes() = 0;
     virtual bool show() {
@@ -32,11 +36,13 @@ public:
         return false;
     }
 
-private:
+protected:
     string name;
     int id;
     int startPinId;
     int endPinId;
+    int inLinkId = -1;
+    int outLinkId = -1;
 };
 
 #endif // UINODE_H

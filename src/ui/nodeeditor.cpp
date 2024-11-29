@@ -9,6 +9,12 @@
 #include "uistoretransformnode.h"
 #include "uirestoretransformnode.h"
 
+NodeEditor::NodeEditor() {
+    const auto& it = nodeList.insert(nodeList.end(), mkU<BeginUINode>(getNewId(), getNewId(), getNewId()));
+    beginNodeId = it->get()->getId();
+    nodeIdMap[beginNodeId] = it;
+}
+
 void NodeEditor::init(GLFWwindow* window) {
     // Setup ImGui context
     IMGUI_CHECKVERSION();
@@ -83,10 +89,14 @@ void NodeEditor::addNode(uPtr<UINode> node) {
 
 bool NodeEditor::maybeAddLink() {
     Link link;
-    if (ImNodes::IsLinkCreated(&link.startPinId, &link.endPinId)) {
+    if (ImNodes::IsLinkCreated(&link.startNodeId, &link.startPinId, &link.endNodeId, &link.endPinId)) {
         link.id = getNewId();
         auto it = linkList.insert(linkList.end(), link);
         linkIdMap[link.id] = it;
+
+        nodeIdMap[link.startNodeId]->get()->setOutLinkId(link.id);
+        nodeIdMap[link.endNodeId]->get()->setInLinkId(link.id);
+
         dirty = true;
         return true;
     }
@@ -103,6 +113,9 @@ bool NodeEditor::shouldDeleteLink(int linkId) {
 void NodeEditor::deleteLink(int linkId) {
     auto it = linkIdMap.find(linkId);
     if (it == linkIdMap.end()) return;
+
+    nodeIdMap[it->second->startNodeId]->get()->setOutLinkId(-1);
+    nodeIdMap[it->second->endNodeId]->get()->setInLinkId(-1);
     
     linkList.erase(it->second);
     linkIdMap.erase(linkId);
@@ -111,6 +124,7 @@ void NodeEditor::deleteLink(int linkId) {
 }
 
 bool NodeEditor::shouldDeleteNode(int nodeId) {
+    if (nodeId == beginNodeId) return false;
     if (ImNodes::IsNodeSelected(nodeId) && ImGui::IsKeyReleased(ImGuiKey_Delete)) {
         return true;
     }
@@ -193,11 +207,22 @@ void NodeEditor::show(
 
 list<uPtr<Node>> NodeEditor::getNodeList() const {
     list<uPtr<Node>> nodes;
-    // Need to handle case where there multiple node chains that arent connected
 
-    for (const auto& node : nodeList) {
-        list<uPtr<Node>> interpreterNodes = node->toInterpreterNodes();
+    // This is pretty janky... a result a bad choice of data model, but it works as a proof of concept.
+    // A better data model would be a graph.
+    int inLink = nodeIdMap.at(beginNodeId)->get()->getOutLinkId();
+    while (inLink != -1) {
+        auto it = linkIdMap.find(inLink);
+        if (it == linkIdMap.end()) break;
+
+        int nodeId = it->second->endNodeId;
+        auto nodeIt = nodeIdMap.find(nodeId);
+        if (nodeIt == nodeIdMap.end()) break;
+
+        list<uPtr<Node>> interpreterNodes = nodeIt->second->get()->toInterpreterNodes();
         nodes.splice(nodes.end(), interpreterNodes);
+
+        inLink = nodeIt->second->get()->getOutLinkId();
     }
 
     return nodes;

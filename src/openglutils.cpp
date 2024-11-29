@@ -37,6 +37,7 @@ GLFWwindow* initializeGLFW() {
     glViewport(0, 0, screenWidth, screenHeight);
 
     // Register callback on window resize
+    // TODO: resize left and right viewports accordingly
     auto frameBufferReziseCallback = [](GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); };
     glfwSetFramebufferSizeCallback(window, frameBufferReziseCallback);
 
