@@ -4,6 +4,8 @@
 #include "imgui_impl_opengl3.h"
 #include "imnodes.h"
 #include "uimovenode.h"
+#include "uiyawnode.h"
+#include "uipitchnode.h"
 
 void NodeEditor::init(GLFWwindow* window) {
     // Setup ImGui context
@@ -50,6 +52,12 @@ void NodeEditor::handleMenuChanges() {
     {
         if (ImGui::MenuItem("Move")) {
             addNode(std::move(mkU<UIMoveNode>(getNewId(), getNewId(), getNewId())));
+        }
+        else if (ImGui::MenuItem("Yaw")) {
+            addNode(std::move(mkU<UIYawNode>(getNewId(), getNewId(), getNewId())));
+        }
+        else if (ImGui::MenuItem("Pitch")) {
+            addNode(std::move(mkU<UIPitchNode>(getNewId(), getNewId(), getNewId())));
         }
         else if (ImGui::MenuItem("Restore")) {
         }

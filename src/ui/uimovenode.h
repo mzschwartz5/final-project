@@ -23,11 +23,19 @@ public:
         UINode::show();
         bool dirty = false;
 
-        if (ImGui::SliderFloat("Distance", &distance, 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat("Distance", &distance, 0.01f, 10.0f)) {
             dirty = true;
         }
 
-        if (ImGui::SliderFloat3("Scale", scale, 0.0f, 1.0f)) {
+        if (ImGui::SliderFloat("ScaleX", &scale[0], 0.01f, 5.0f)) {
+            dirty = true;
+        }
+
+        if (ImGui::SliderFloat("ScaleY", &scale[1], 0.01f, 5.0f)) {
+            dirty = true;
+        }
+
+        if (ImGui::SliderFloat("ScaleZ", &scale[2], 0.01f, 5.0f)) {
             dirty = true;
         }
 
