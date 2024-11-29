@@ -49,7 +49,7 @@ int NodeEditor::getNewId() {
 
 void NodeEditor::handleMenuChanges() {
     const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
-                            ImNodes::IsEditorHovered() && ImGui::IsKeyReleased(ImGuiKey_Tab);
+                            ImNodes::IsEditorHovered() && ImGui::IsKeyReleased(ImGuiKey_A);
 
     if (!ImGui::IsAnyItemHovered() && open_popup)
     {

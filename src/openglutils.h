@@ -19,7 +19,7 @@ enum Viewport {
 class SplitViewport {
 
 public:
-    SplitViewport(Camera* cameraLeft, Camera* cameraRight);
+    SplitViewport(GLFWwindow* window, Camera* cameraLeft, Camera* cameraRight);
     float getViewportSplitRatio() const { return viewportSplitRatio; }
     void setViewportSplitRatio(double ratio);
     void setViewport(Viewport viewPort);
@@ -33,6 +33,8 @@ public:
         return cameras[viewPort];
     }
 private:
+    float windowWidth = Constants::SCR_WIDTH;
+    float windowHeight = Constants::SCR_HEIGHT;
     float viewportSplitRatio = 0.5;
     int borderWidthPixels = 2;
     int borderWidthBuffer = 2; // (Invisible) buffer to make the border easier to click

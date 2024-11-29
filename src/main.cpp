@@ -31,7 +31,7 @@ int main() {
 		GLFWwindow* window = OpenGLUtils::initializeGLFW();
 		Camera cameraLeft;
 		Camera cameraRight;
-		OpenGLUtils::SplitViewport splitViewport(&cameraLeft, &cameraRight);
+		OpenGLUtils::SplitViewport splitViewport(window, &cameraLeft, &cameraRight);
 		GLFWcursor* resizeCursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
 		OpenGLUtils::MouseCallbackContext context{ &splitViewport, resizeCursor };
 		OpenGLUtils::bindMouseInputsToWindow(window, context);

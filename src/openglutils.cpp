@@ -36,11 +36,6 @@ GLFWwindow* initializeGLFW() {
     glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
     glViewport(0, 0, screenWidth, screenHeight);
 
-    // Register callback on window resize
-    // TODO: resize left and right viewports accordingly
-    auto frameBufferReziseCallback = [](GLFWwindow* window, int width, int height) { glViewport(0, 0, width, height); };
-    glfwSetFramebufferSizeCallback(window, frameBufferReziseCallback);
-
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
 
@@ -137,7 +132,7 @@ void bindMouseInputsToWindow(GLFWwindow* window, MouseCallbackContext context) {
     glfwSetWindowUserPointer(window, nullptr);
 }
 
-SplitViewport::SplitViewport(Camera* const cameraLeft, Camera* const cameraRight) :
+SplitViewport::SplitViewport(GLFWwindow* window, Camera* const cameraLeft, Camera* const cameraRight) :
     viewports({
         {Viewport::LEFT, std::array<GLint, 4>{0, 0, static_cast<GLint>(Constants::SCR_WIDTH * viewportSplitRatio), Constants::SCR_HEIGHT}},
         {Viewport::RIGHT, std::array<GLint, 4>{static_cast<GLint>(Constants::SCR_WIDTH * viewportSplitRatio), 0, static_cast<GLint>(Constants::SCR_WIDTH * (1.0f - viewportSplitRatio)), Constants::SCR_HEIGHT}},
@@ -149,6 +144,24 @@ SplitViewport::SplitViewport(Camera* const cameraLeft, Camera* const cameraRight
         {Viewport::BORDER, nullptr}
     })
 {
+    glfwSetWindowUserPointer(window, this);
+    auto frameBufferReziseCallback = [](GLFWwindow* window, int width, int height) { 
+        static SplitViewport* splitViewport = static_cast<SplitViewport*>(glfwGetWindowUserPointer(window));
+        splitViewport->windowWidth = width;
+        splitViewport->windowHeight = height;
+        // Call this to set the widths
+        splitViewport->setViewportSplitRatio(splitViewport->viewportSplitRatio);
+
+        // Update the heights manually
+        splitViewport->viewports[Viewport::LEFT][3] = height;
+        splitViewport->viewports[Viewport::RIGHT][3] = height;
+        splitViewport->viewports[Viewport::BORDER][3] = height;
+    };
+    glfwSetFramebufferSizeCallback(window, frameBufferReziseCallback);
+    frameBufferReziseCallback(window, Constants::SCR_WIDTH, Constants::SCR_HEIGHT); // Call once to initialize the context pointer.
+
+    glfwSetWindowUserPointer(window, nullptr);
+
     cameraLeft->setScreenDims(viewports[Viewport::LEFT][2], viewports[Viewport::LEFT][3]);
     cameraRight->setScreenDims(viewports[Viewport::RIGHT][2], viewports[Viewport::RIGHT][3]);
 }
@@ -160,10 +173,10 @@ void SplitViewport::setViewport(Viewport viewportType) {
 
 void SplitViewport::setViewportSplitRatio(double ratio) {
     viewportSplitRatio = glm::clamp(ratio, 0.1, 0.9);
-    viewports[Viewport::LEFT][2] = static_cast<GLint>(Constants::SCR_WIDTH * viewportSplitRatio);
-    viewports[Viewport::RIGHT][0] = static_cast<GLint>(Constants::SCR_WIDTH * viewportSplitRatio);
-    viewports[Viewport::RIGHT][2] = static_cast<GLint>(Constants::SCR_WIDTH * (1.0f - viewportSplitRatio));
-    viewports[Viewport::BORDER][0] = static_cast<GLint>(viewportSplitRatio * Constants::SCR_WIDTH - borderWidthPixels / 2);
+    viewports[Viewport::LEFT][2] = static_cast<GLint>(windowWidth * viewportSplitRatio);
+    viewports[Viewport::RIGHT][0] = static_cast<GLint>(windowWidth * viewportSplitRatio);
+    viewports[Viewport::RIGHT][2] = static_cast<GLint>(windowWidth * (1.0f - viewportSplitRatio));
+    viewports[Viewport::BORDER][0] = static_cast<GLint>(viewportSplitRatio * windowWidth - borderWidthPixels / 2);
 
     cameras[Viewport::LEFT]->setScreenDims(viewports[Viewport::LEFT][2], viewports[Viewport::LEFT][3]);
     cameras[Viewport::RIGHT]->setScreenDims(viewports[Viewport::RIGHT][2], viewports[Viewport::RIGHT][3]);
@@ -178,10 +191,10 @@ void SplitViewport::drawViewportBorder() {
 }
 
 Viewport SplitViewport::getActiveViewport(double cursorPosX) const {
-    if (cursorPosX < Constants::SCR_WIDTH * viewportSplitRatio - (borderWidthPixels + borderWidthBuffer) / 2) {
+    if (cursorPosX < windowWidth * viewportSplitRatio - (borderWidthPixels + borderWidthBuffer) / 2) {
         return Viewport::LEFT;
     }
-    else if (cursorPosX > Constants::SCR_WIDTH * viewportSplitRatio + (borderWidthPixels + borderWidthBuffer) / 2) {
+    else if (cursorPosX > windowWidth * viewportSplitRatio + (borderWidthPixels + borderWidthBuffer) / 2) {
         return Viewport::RIGHT;
     }
 
