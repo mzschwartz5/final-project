@@ -32,28 +32,65 @@ void NodeEditor::teardown() {
     ImGui::DestroyContext();
 }
 
+int NodeEditor::getNewId() {
+    return uniqueId++;
+}
+
+void NodeEditor::addNode() {
+    int nodeId = getNewId();
+    ImNodes::SetNodeScreenSpacePos(nodeId, ImGui::GetMousePos());
+    auto it = nodeList.insert(nodeList.end(), {nodeId, getNewId(), getNewId()});
+    nodeIdMap[nodeId] = it;
+}
+
+void NodeEditor::maybeChangeNodeMenuState() {
+    const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
+                            ImNodes::IsEditorHovered() && ImGui::IsKeyReleased(ImGuiKey_A);
+
+    if (!ImGui::IsAnyItemHovered() && open_popup)
+    {
+        ImGui::OpenPopup("Add Node");
+    }
+
+    if (ImGui::BeginPopup("Add Node"))
+    {
+        if (ImGui::MenuItem("add")) {
+            addNode();
+        }
+        ImGui::EndPopup();
+    }
+}
+
 void NodeEditor::show(
     int editorPosX,
     int editorPosY,
     int editorWidth,
     int editorHeight
 ) {
-
     // Set ImGui window pos and size to only overlay the right viewport
     ImGui::SetNextWindowPos(ImVec2(editorPosX, editorPosY));
     ImGui::SetNextWindowSize(ImVec2(editorWidth, editorHeight));
-
-    ImGui::Begin("Node editor", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+    ImGui::Begin("Node editor", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse );
     ImNodes::BeginNodeEditor();
-    ImNodes::BeginNode(0);
-    ImGui::Dummy(ImVec2(80.0f, 45.0f));
-    ImNodes::BeginOutputAttribute(1);
-    ImGui::Text("output pin");
-    ImNodes::EndOutputAttribute();
-    ImNodes::EndNode();
+
+    maybeChangeNodeMenuState();
+
+    for (auto& node : nodeList) {
+        ImNodes::BeginNode(node.id);
+        ImNodes::BeginNodeTitleBar();
+        ImGui::Text("Node %d", node.id);
+        ImNodes::EndNodeTitleBar();
+        ImNodes::BeginInputAttribute(node.inpinId + 1);
+        ImGui::Text("input pin");
+        ImNodes::EndInputAttribute();
+        ImNodes::BeginOutputAttribute(node.outpinId + 2);
+        ImGui::Text("output pin");
+        ImNodes::EndOutputAttribute();
+        ImNodes::EndNode();
+    }
+
     ImNodes::EndNodeEditor();
     ImGui::End();
-
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
