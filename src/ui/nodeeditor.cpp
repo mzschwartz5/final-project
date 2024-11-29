@@ -36,15 +36,8 @@ int NodeEditor::getNewId() {
     return uniqueId++;
 }
 
-void NodeEditor::addNode(NodeType nodeType, const string& name) {
-    int nodeId = getNewId();
-    ImNodes::SetNodeScreenSpacePos(nodeId, ImGui::GetMousePos());
-    auto it = nodeList.insert(nodeList.end(), {nodeType, name, nodeId, getNewId(), getNewId()});
-    nodeIdMap[nodeId] = it;
-    dirty = true;
-}
 
-void NodeEditor::maybeChangeNodeMenuState() {
+void NodeEditor::handleMenuChanges() {
     const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
                             ImNodes::IsEditorHovered() && ImGui::IsKeyReleased(ImGuiKey_Tab);
 
@@ -69,6 +62,71 @@ void NodeEditor::maybeChangeNodeMenuState() {
     }
 }
 
+void NodeEditor::addNode(NodeType nodeType, const string& name) {
+    int nodeId = getNewId();
+    ImNodes::SetNodeScreenSpacePos(nodeId, ImGui::GetMousePos());
+    auto it = nodeList.insert(nodeList.end(), {nodeType, name, nodeId, getNewId(), getNewId()});
+    nodeIdMap[nodeId] = it;
+    dirty = true;
+}
+
+bool NodeEditor::maybeAddLink() {
+    Link link;
+    if (ImNodes::IsLinkCreated(&link.startPinId, &link.endPinId)) {
+        link.id = getNewId();
+        auto it = linkList.insert(linkList.end(), link);
+        linkIdMap[link.id] = it;
+        dirty = true;
+        return true;
+    }
+    return false;
+}
+
+bool NodeEditor::shouldDeleteLink(int linkId) {
+    if (ImNodes::IsLinkSelected(linkId) && ImGui::IsKeyReleased(ImGuiKey_Delete)) {
+        return true;
+    }
+    return false;
+}
+
+void NodeEditor::deleteLink(int linkId) {
+    auto it = linkIdMap.find(linkId);
+    if (it == linkIdMap.end()) return;
+    
+    linkList.erase(it->second);
+    linkIdMap.erase(linkId);
+
+    dirty = true;
+}
+
+bool NodeEditor::shouldDeleteNode(int nodeId) {
+    if (ImNodes::IsNodeSelected(nodeId) && ImGui::IsKeyReleased(ImGuiKey_Delete)) {
+        return true;
+    }
+    return false;
+}
+
+void NodeEditor::deleteNode(int nodeId) {
+    auto it = nodeIdMap[nodeId];
+
+    // Remove all links connected to this node
+    std::vector<int> linksToDelete;
+    for (const Link& link : linkList) {
+        if (link.startPinId == it->endPinId || link.endPinId == it->startPinId) {
+            linksToDelete.push_back(link.id);
+        }
+    }
+
+    for (int linkId : linksToDelete) {
+        deleteLink(linkId);
+    }
+
+    nodeList.erase(it);
+    nodeIdMap.erase(nodeId);
+
+    dirty = true;
+}
+
 void NodeEditor::show(
     int editorPosX,
     int editorPosY,
@@ -79,25 +137,52 @@ void NodeEditor::show(
     ImGui::SetNextWindowPos(ImVec2(editorPosX, editorPosY));
     ImGui::SetNextWindowSize(ImVec2(editorWidth, editorHeight));
     ImGui::Begin("Node editor", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse );
+
+    maybeAddLink();
+    
     ImNodes::BeginNodeEditor();
+    handleMenuChanges();
 
-    maybeChangeNodeMenuState();
+    std::vector<int> nodesToDelete;
+    std::vector<int> linksToDelete;
 
-    for (auto& node : nodeList) {
+    for (const auto& node : nodeList) {
+        if (shouldDeleteNode(node.id)) {
+            nodesToDelete.push_back(node.id);
+            continue;
+        }
+
         ImNodes::BeginNode(node.id);
         ImNodes::BeginNodeTitleBar();
         ImGui::Text("%s", node.name.c_str());
         ImNodes::EndNodeTitleBar();
-        ImNodes::BeginInputAttribute(node.inpinId + 1);
+        ImNodes::BeginInputAttribute(node.startPinId);
         ImGui::Text("input pin");
         ImNodes::EndInputAttribute();
-        ImNodes::BeginOutputAttribute(node.outpinId + 2);
+        ImNodes::BeginOutputAttribute(node.endPinId);
         ImGui::Text("output pin");
         ImNodes::EndOutputAttribute();
         ImNodes::EndNode();
     }
 
+    for (const Link& link : linkList) {
+        if (shouldDeleteLink(link.id)) {
+            linksToDelete.push_back(link.id);
+            continue;
+        }
+        ImNodes::Link(link.id, link.startPinId, link.endPinId);
+    }
+
     ImNodes::EndNodeEditor();
+
+    for (int nodeId : nodesToDelete) {
+        deleteNode(nodeId);
+    }
+
+    for (int linkId : linksToDelete) {
+        deleteLink(linkId);
+    }
+
     ImGui::End();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -106,5 +191,6 @@ void NodeEditor::show(
 }
 
 list<uPtr<Node>> NodeTranslator::translate(list<UINode> uiNodeList) {
+    // Todo: handle broken list?
     return {};
 }

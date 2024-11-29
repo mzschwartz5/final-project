@@ -22,8 +22,14 @@ struct UINode {
     NodeType type;
     string name;
     int id;
-    int inpinId;
-    int outpinId;
+    int startPinId;
+    int endPinId;
+};
+
+struct Link {
+    int id;
+    int startPinId;
+    int endPinId;
 };
 
 // Factory class to create application nodes from UI nodes
@@ -54,12 +60,19 @@ public:
 private:
     int getNewId();
     void addNode(NodeType nodeType, const string& name);
-    void maybeChangeNodeMenuState();
+    void handleMenuChanges();
+    bool shouldDeleteNode(int nodeId);
+    void deleteNode(int nodeId);
+    bool maybeAddLink();
+    bool shouldDeleteLink(int linkId);
+    void deleteLink(int linkId);
     NodeTranslator translator;
     bool dirty = false;
     int uniqueId = 0;
     list<UINode> nodeList;
+    list<Link> linkList;
     unordered_map<int, list<UINode>::iterator> nodeIdMap;
+    unordered_map<int, list<Link>::iterator> linkIdMap;
 };
 
 #endif
