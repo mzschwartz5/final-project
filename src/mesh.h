@@ -24,6 +24,8 @@ public:
 	void updateSSBO(unsigned int SSBO, const void* data, size_t size);
 	void draw();
 	void reset();
+	void clearSSBOs();
+	void clearVertices();
 	Shader& getShader() { return m_shader; }
 
 private:

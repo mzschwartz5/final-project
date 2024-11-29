@@ -8,36 +8,15 @@
 #include <unordered_map>
 #include "macros.h"
 #include <string>
+#include "uinode.h"
 using std::list;
 using std::unordered_map;
 using std::string;
-
-enum class NodeType {
-    MOVE,
-    RESTORE,
-    STORE,
-};
-
-struct UINode {
-    NodeType type;
-    string name;
-    int id;
-    int startPinId;
-    int endPinId;
-};
 
 struct Link {
     int id;
     int startPinId;
     int endPinId;
-};
-
-// Factory class to create application nodes from UI nodes
-class NodeTranslator {
-public:
-    NodeTranslator() = default;
-    ~NodeTranslator() = default;
-    list<uPtr<Node>> translate(list<UINode> nodeList);
 };
 
 class NodeEditor {
@@ -54,24 +33,24 @@ public:
         int editorWidth,
         int editorHeight
     );
-    list<uPtr<Node>> getNodeList() { return translator.translate(nodeList); }
+    list<uPtr<Node>> getNodeList() const;
     bool isDirty() { return dirty; }
+    void setDirty(bool dirty) { this->dirty = dirty; }
 
 private:
     int getNewId();
-    void addNode(NodeType nodeType, const string& name);
+    void addNode(uPtr<UINode> node);
     void handleMenuChanges();
     bool shouldDeleteNode(int nodeId);
     void deleteNode(int nodeId);
     bool maybeAddLink();
     bool shouldDeleteLink(int linkId);
     void deleteLink(int linkId);
-    NodeTranslator translator;
     bool dirty = false;
     int uniqueId = 0;
-    list<UINode> nodeList;
+    list<uPtr<UINode>> nodeList;
     list<Link> linkList;
-    unordered_map<int, list<UINode>::iterator> nodeIdMap;
+    unordered_map<int, list<uPtr<UINode>>::iterator> nodeIdMap;
     unordered_map<int, list<Link>::iterator> linkIdMap;
 };
 

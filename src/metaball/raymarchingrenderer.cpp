@@ -38,7 +38,7 @@ void RaymarchingRenderer::reset() {
     metaballPositionsBuffer = 0;
     metaballRadiiBuffer = 0;
     metaballScaleBuffer = 0;
-    quad.getMesh().reset();
+    quad.getMesh().clearSSBOs();
 }
 
 void RaymarchingRenderer::render(

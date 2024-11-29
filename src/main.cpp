@@ -49,6 +49,7 @@ int main() {
 		{
 			if (nodeEditor.isDirty()) {
 				interpreter.run(nodeEditor.getNodeList());
+				nodeEditor.setDirty(false);
 			}
 
 			nodeEditor.reset();
@@ -57,17 +58,15 @@ int main() {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			// Render left viewport
 			splitViewport.setViewport(OpenGLUtils::Viewport::LEFT);
-			turtle.drawLines(cameraLeft.calcViewMatrix(), cameraLeft.calcProjectionMatrix(splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::LEFT)));
+			turtle.drawGeometry(
+				cameraLeft.calcViewMatrix(),
+				glm::vec2(splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::LEFT)),
+				0.0f,
+				cameraLeft.getNearPlaneDims(),
+				cameraLeft.getNearPlane()
+			);
 
-			// Render right viewport
 			splitViewport.setViewport(OpenGLUtils::Viewport::RIGHT);
-			// turtle.drawGeometry(
-			// 	cameraRight.calcViewMatrix(),
-			// 	glm::vec2(splitViewport.getViewportWidth(OpenGLUtils::Viewport::RIGHT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::RIGHT)),
-			// 	splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT),
-			// 	cameraRight.getNearPlaneDims(),
-			// 	cameraRight.getNearPlane()
-			// );
 
 			// Render a border bar between the two viewports
 			splitViewport.setViewport(OpenGLUtils::Viewport::BORDER);

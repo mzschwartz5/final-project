@@ -19,7 +19,7 @@ public:
         assert(!_instantiated);
         _instantiated = true;
         mesh.setDrawMode(GL_LINES);
-        positionIndex = mesh.addVertex(Vertex(vec3(0.0f, 0.0f, 0.5f), vec3(0.0f, 0.0f, 0.0f), vec2(0.0f, 0.0f)));
+        positionIndex = mesh.addVertex(Vertex(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec2(0.0f, 0.0f)));
     }
 
     ~Turtle() {

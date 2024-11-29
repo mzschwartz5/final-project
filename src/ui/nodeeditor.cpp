@@ -3,6 +3,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "imnodes.h"
+#include "uimovenode.h"
 
 void NodeEditor::init(GLFWwindow* window) {
     // Setup ImGui context
@@ -36,7 +37,6 @@ int NodeEditor::getNewId() {
     return uniqueId++;
 }
 
-
 void NodeEditor::handleMenuChanges() {
     const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
                             ImNodes::IsEditorHovered() && ImGui::IsKeyReleased(ImGuiKey_Tab);
@@ -49,23 +49,21 @@ void NodeEditor::handleMenuChanges() {
     if (ImGui::BeginPopup("Add Node"))
     {
         if (ImGui::MenuItem("Move")) {
-            addNode(NodeType::MOVE, "Move");
+            addNode(std::move(mkU<UIMoveNode>(getNewId(), getNewId(), getNewId())));
         }
         else if (ImGui::MenuItem("Restore")) {
-            addNode(NodeType::RESTORE, "Restore");
         }
         else if (ImGui::MenuItem("Store")) {
-            addNode(NodeType::STORE, "Store");
         }
         
         ImGui::EndPopup();
     }
 }
 
-void NodeEditor::addNode(NodeType nodeType, const string& name) {
-    int nodeId = getNewId();
+void NodeEditor::addNode(uPtr<UINode> node) {
+    int nodeId = node->getId();
     ImNodes::SetNodeScreenSpacePos(nodeId, ImGui::GetMousePos());
-    auto it = nodeList.insert(nodeList.end(), {nodeType, name, nodeId, getNewId(), getNewId()});
+    auto it = nodeList.insert(nodeList.end(), std::move(node));
     nodeIdMap[nodeId] = it;
     dirty = true;
 }
@@ -112,7 +110,7 @@ void NodeEditor::deleteNode(int nodeId) {
     // Remove all links connected to this node
     std::vector<int> linksToDelete;
     for (const Link& link : linkList) {
-        if (link.startPinId == it->endPinId || link.endPinId == it->startPinId) {
+        if (link.startPinId == it->get()->getEndPinId() || link.endPinId == it->get()->getStartPinId()) {
             linksToDelete.push_back(link.id);
         }
     }
@@ -147,21 +145,13 @@ void NodeEditor::show(
     std::vector<int> linksToDelete;
 
     for (const auto& node : nodeList) {
-        if (shouldDeleteNode(node.id)) {
-            nodesToDelete.push_back(node.id);
+        if (shouldDeleteNode(node->getId())) {
+            nodesToDelete.push_back(node->getId());
             continue;
         }
 
-        ImNodes::BeginNode(node.id);
-        ImNodes::BeginNodeTitleBar();
-        ImGui::Text("%s", node.name.c_str());
-        ImNodes::EndNodeTitleBar();
-        ImNodes::BeginInputAttribute(node.startPinId);
-        ImGui::Text("input pin");
-        ImNodes::EndInputAttribute();
-        ImNodes::BeginOutputAttribute(node.endPinId);
-        ImGui::Text("output pin");
-        ImNodes::EndOutputAttribute();
+        ImNodes::BeginNode(node->getId());
+        if (node->show()) dirty = true;
         ImNodes::EndNode();
     }
 
@@ -186,11 +176,16 @@ void NodeEditor::show(
     ImGui::End();
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    dirty = false;
 }
 
-list<uPtr<Node>> NodeTranslator::translate(list<UINode> uiNodeList) {
-    // Todo: handle broken list?
-    return {};
+list<uPtr<Node>> NodeEditor::getNodeList() const {
+    list<uPtr<Node>> nodes;
+    // Need to handle case where there multiple node chains that arent connected
+
+    for (const auto& node : nodeList) {
+        list<uPtr<Node>> interpreterNodes = node->toInterpreterNodes();
+        nodes.splice(nodes.end(), interpreterNodes);
+    }
+
+    return nodes;
 }

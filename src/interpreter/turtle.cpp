@@ -42,6 +42,7 @@ void Turtle::reset() {
     metaballs.clear();
     raymarchingRenderer.reset();
     mesh.reset();
+    mesh.addVertex(Vertex(position, vec3(0.0f, 0.0f, 0.0f), vec2(0.0f, 0.0f)));
 }
 
 void Turtle::rotate(float yaw, float pitch) {
