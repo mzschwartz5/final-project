@@ -31,6 +31,7 @@ public:
     Turtle& getTurtle() { return turtle; }
 
 private:
+    void clearStack();
     static bool _instantiated;
     static const int MAX_STACK_SIZE = 1000;
     int stackSize = 0;

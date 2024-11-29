@@ -6,6 +6,8 @@
 #include "uimovenode.h"
 #include "uiyawnode.h"
 #include "uipitchnode.h"
+#include "uistoretransformnode.h"
+#include "uirestoretransformnode.h"
 
 void NodeEditor::init(GLFWwindow* window) {
     // Setup ImGui context
@@ -50,6 +52,7 @@ void NodeEditor::handleMenuChanges() {
 
     if (ImGui::BeginPopup("Add Node"))
     {
+        // TODO: turn this into a for loop with a factor pattern to create the nodes
         if (ImGui::MenuItem("Move")) {
             addNode(std::move(mkU<UIMoveNode>(getNewId(), getNewId(), getNewId())));
         }
@@ -60,8 +63,10 @@ void NodeEditor::handleMenuChanges() {
             addNode(std::move(mkU<UIPitchNode>(getNewId(), getNewId(), getNewId())));
         }
         else if (ImGui::MenuItem("Restore")) {
+            addNode(std::move(mkU<UIRestoreTransformNode>(getNewId(), getNewId(), getNewId())));
         }
         else if (ImGui::MenuItem("Store")) {
+            addNode(std::move(mkU<UIStoreTransformNode>(getNewId(), getNewId(), getNewId())));
         }
         
         ImGui::EndPopup();

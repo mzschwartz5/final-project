@@ -4,6 +4,7 @@
 bool Interpreter::_instantiated = false;
 
 void Interpreter::run(const list<uPtr<Node>>& nodeList) {
+    clearStack();
     turtle.reset();
 
     for (auto& node : nodeList) {
@@ -11,6 +12,10 @@ void Interpreter::run(const list<uPtr<Node>>& nodeList) {
     }
     
     turtle.finalize();
+}
+
+void Interpreter::clearStack() {
+    stackSize = 0;
 }
 
 void Interpreter::push(float value) {

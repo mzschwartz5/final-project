@@ -9,6 +9,7 @@ class UIMoveNode : public UINode {
 public:
     UIMoveNode(int id, int startPinId, int endPinId) : UINode("Move", id, startPinId, endPinId) {}
     ~UIMoveNode() = default;
+
     list<uPtr<Node>> toInterpreterNodes() override {
         list<uPtr<Node>> nodes;
         nodes.push_back(mkU<NumberNode>(distance));
@@ -19,6 +20,7 @@ public:
         nodes.push_back(mkU<MoveNode>());
         return nodes;
     }
+    
     bool show() override {
         UINode::show();
         bool dirty = false;
