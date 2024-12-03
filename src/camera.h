@@ -22,6 +22,8 @@ public:
 	float getFov() const;
 	void setFov(float newFov);
 	void orbitCamera(double xoffset, double yoffset);
+	void pan(double xoffset, double yoffset);
+	void dolly(double yoffset);
 	float getNearPlane() const;
 	float getFarPlane() const;
 	vec2 getNearPlaneDims() const;

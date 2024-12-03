@@ -59,31 +59,20 @@ void bindMouseInputsToWindow(GLFWwindow* window, MouseCallbackContext context) {
         static double lastX{ xpos };
         static double lastY{ ypos };
         static Camera* currentCamera{ nullptr };
-        static bool resizingViewports{ false };
 
         // Retrieve pointer to camera from GLFW and call method to set the camera front vector
         MouseCallbackContext* context = static_cast<MouseCallbackContext*>(glfwGetWindowUserPointer(window));
         static SplitViewport* splitViewport = context->splitViewport;
         static GLFWcursor* resizeCursor = context->resizeCursor;
+        MouseMode mouseMode = splitViewport->getMouseMode();
 
-        double cursorXPos, cursorYPos;
-        glfwGetCursorPos(window, &cursorXPos, &cursorYPos);
+        Viewport activeViewport = splitViewport->getActiveViewport(xpos);
 
-        Viewport activeViewport = splitViewport->getActiveViewport(cursorXPos);
-
-        if (activeViewport == Viewport::BORDER || resizingViewports) {
+        if (activeViewport == Viewport::BORDER || mouseMode == MouseMode::RESIZING) {
             glfwSetCursor(window, resizeCursor);
         }
         else {
             glfwSetCursor(window, NULL);
-        }
-
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS) {
-            lastX = xpos;
-            lastY = ypos;
-            currentCamera = nullptr;
-            resizingViewports = false;
-            return;
         }
 
         double xoffset = xpos - lastX;
@@ -91,16 +80,29 @@ void bindMouseInputsToWindow(GLFWwindow* window, MouseCallbackContext context) {
         lastX = xpos;
         lastY = ypos;
 
-        // Mouse is in the border bar between the two viewports and we're not currently adjusting either camera.
-        if (!currentCamera && (activeViewport == Viewport::BORDER || resizingViewports)) {
-            splitViewport->setViewportSplitRatio(cursorXPos / Constants::SCR_WIDTH);
-            resizingViewports = true;
+        // Only switch the current camera if we've let go of the mouse button.
+        if (!currentCamera) currentCamera = splitViewport->getCamera(activeViewport);
+
+        if (mouseMode == MouseMode::PANNING) {
+            if (activeViewport == Viewport::BORDER) return;
+            currentCamera->pan(xoffset, yoffset);
             return;
         }
 
-        // Only switch the current camera if we've let go of the mouse button.
-        if (!currentCamera) currentCamera = splitViewport->getCamera(activeViewport);
-        currentCamera->orbitCamera(xoffset, yoffset);
+        if (mouseMode == MouseMode::ORBITING) {
+            currentCamera->orbitCamera(xoffset, yoffset);
+            return;
+        }
+
+        if (mouseMode == MouseMode::RESIZING) {
+            splitViewport->setViewportSplitRatio(xpos / Constants::SCR_WIDTH);
+            return;
+        }
+
+        if (mouseMode == MouseMode::NONE) {
+            currentCamera = nullptr;
+            return;
+        }
     };
     glfwSetCursorPosCallback(window, mouseCallback); // register callback
 
@@ -111,7 +113,7 @@ void bindMouseInputsToWindow(GLFWwindow* window, MouseCallbackContext context) {
 
     // Lambda for scroll input callback
     auto scrollCallback = [](GLFWwindow* window, double xoffset, double yoffset) {
-        float sensitivty = 1.5f;
+        float sensitivty = 5.0f;
         MouseCallbackContext* context = static_cast<MouseCallbackContext*>(glfwGetWindowUserPointer(window));
         static SplitViewport* splitViewport = context->splitViewport;
 
@@ -121,27 +123,45 @@ void bindMouseInputsToWindow(GLFWwindow* window, MouseCallbackContext context) {
         Viewport activeViewport = splitViewport->getActiveViewport(cursorXPos);
         Camera* pCamera = splitViewport->getCamera(activeViewport);
 
-        float fov = pCamera->getFov();
-        fov -= (float)(yoffset * sensitivty);
-        pCamera->setFov(fov);
+        pCamera->dolly(yoffset * sensitivty);
     };
     glfwSetScrollCallback(window, scrollCallback); // register callback
     scrollCallback(window, 0.0, 0.0); // call once to initialize the context pointer, so we can then clear it.
+
+    auto mouseButtonCallback = [](GLFWwindow* window, int button, int action, int mods) {
+        MouseCallbackContext* context = static_cast<MouseCallbackContext*>(glfwGetWindowUserPointer(window));
+        static SplitViewport* splitViewport = context->splitViewport;
+
+        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+            splitViewport->setMouseMode(MouseMode::ORBITING);
+        }
+        else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+            splitViewport->setMouseMode(MouseMode::RESIZING);
+        }
+        else if (button = GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
+            splitViewport->setMouseMode(MouseMode::PANNING);
+        }
+        else if (action == GLFW_RELEASE) {
+            splitViewport->setMouseMode(MouseMode::NONE);
+        }
+    };
+    glfwSetMouseButtonCallback(window, mouseButtonCallback); // register callback
+    mouseButtonCallback(window, 0, 0, 0); // call once to initialize the context pointer, so we can then clear it.
 
     // Unbind GLFW user pointer
     glfwSetWindowUserPointer(window, nullptr);
 }
 
-SplitViewport::SplitViewport(GLFWwindow* window, Camera* const cameraLeft, Camera* const cameraRight) :
+SplitViewport::SplitViewport(GLFWwindow* window) :
     viewports({
         {Viewport::LEFT, std::array<GLint, 4>{0, 0, static_cast<GLint>(Constants::SCR_WIDTH * viewportSplitRatio), Constants::SCR_HEIGHT}},
         {Viewport::RIGHT, std::array<GLint, 4>{static_cast<GLint>(Constants::SCR_WIDTH * viewportSplitRatio), 0, static_cast<GLint>(Constants::SCR_WIDTH * (1.0f - viewportSplitRatio)), Constants::SCR_HEIGHT}},
         {Viewport::BORDER, std::array<GLint, 4>{static_cast<GLint>(viewportSplitRatio * Constants::SCR_WIDTH - borderWidthPixels / 2), 0, borderWidthPixels, Constants::SCR_HEIGHT}}
     }),
     cameras({
-        {Viewport::LEFT, cameraLeft},
-        {Viewport::RIGHT, cameraRight},
-        {Viewport::BORDER, nullptr}
+        {Viewport::LEFT, Camera()},
+        {Viewport::RIGHT, Camera()},
+        {Viewport::BORDER, Camera()}
     })
 {
     glfwSetWindowUserPointer(window, this);
@@ -162,8 +182,8 @@ SplitViewport::SplitViewport(GLFWwindow* window, Camera* const cameraLeft, Camer
 
     glfwSetWindowUserPointer(window, nullptr);
 
-    cameraLeft->setScreenDims(viewports[Viewport::LEFT][2], viewports[Viewport::LEFT][3]);
-    cameraRight->setScreenDims(viewports[Viewport::RIGHT][2], viewports[Viewport::RIGHT][3]);
+    cameras[Viewport::LEFT].setScreenDims(viewports[Viewport::LEFT][2], viewports[Viewport::LEFT][3]);
+    cameras[Viewport::RIGHT].setScreenDims(viewports[Viewport::RIGHT][2], viewports[Viewport::RIGHT][3]);
 }
 
 void SplitViewport::setViewport(Viewport viewportType) {
@@ -178,8 +198,8 @@ void SplitViewport::setViewportSplitRatio(double ratio) {
     viewports[Viewport::RIGHT][2] = static_cast<GLint>(windowWidth * (1.0f - viewportSplitRatio));
     viewports[Viewport::BORDER][0] = static_cast<GLint>(viewportSplitRatio * windowWidth - borderWidthPixels / 2);
 
-    cameras[Viewport::LEFT]->setScreenDims(viewports[Viewport::LEFT][2], viewports[Viewport::LEFT][3]);
-    cameras[Viewport::RIGHT]->setScreenDims(viewports[Viewport::RIGHT][2], viewports[Viewport::RIGHT][3]);
+    cameras[Viewport::LEFT].setScreenDims(viewports[Viewport::LEFT][2], viewports[Viewport::LEFT][3]);
+    cameras[Viewport::RIGHT].setScreenDims(viewports[Viewport::RIGHT][2], viewports[Viewport::RIGHT][3]);
 }
 
 void SplitViewport::drawViewportBorder() {

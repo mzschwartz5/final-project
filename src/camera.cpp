@@ -42,14 +42,35 @@ void Camera::orbitCamera(double xoffset, double yoffset) {
 	updateCameraVectors();
 }
 
+void Camera::dolly(double yoffset) {
+	const double sensitivity = 0.1f;
+	yoffset *= sensitivity;
+
+	cameraPos += cameraFront * (float)yoffset;
+}
+
+void Camera::pan(double xoffset, double yoffset) {
+	const double sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	orbitTarget -= cameraRight * (float)xoffset;
+	orbitTarget -= cameraUp * (float)yoffset;
+	cameraPos -= cameraRight * (float)xoffset;
+	cameraPos -= cameraUp * (float)yoffset;
+}
+
 void Camera::updateCameraVectors() {
 	glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	// Given updated yaw and pitch, orbit the camera around the target
 	float orbitRadius = glm::length(cameraPos - orbitTarget);
-	cameraPos.x = orbitRadius * cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraPos.y = -orbitRadius * sin(glm::radians(pitch));
-	cameraPos.z = orbitRadius * sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	vec3 orbit;
+	orbit.x = orbitRadius * cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	orbit.y = -orbitRadius * sin(glm::radians(pitch));
+	orbit.z = orbitRadius * sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
+	cameraPos = orbitTarget + orbit;
 
 	cameraFront = glm::normalize(orbitTarget - cameraPos);
 	cameraRight = glm::normalize(glm::cross(cameraFront, worldUp));

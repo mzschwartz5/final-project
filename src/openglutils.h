@@ -16,10 +16,17 @@ enum Viewport {
     BORDER
 };
 
+enum MouseMode {
+    RESIZING,
+    PANNING,
+    ORBITING,
+    NONE
+};
+
 class SplitViewport {
 
 public:
-    SplitViewport(GLFWwindow* window, Camera* cameraLeft, Camera* cameraRight);
+    SplitViewport(GLFWwindow* window);
     float getViewportSplitRatio() const { return viewportSplitRatio; }
     void setViewportSplitRatio(double ratio);
     void setViewport(Viewport viewPort);
@@ -30,8 +37,11 @@ public:
     int getBorderWidthPixels() const { return borderWidthPixels; }
     int getBorderWidthBuffer() const { return borderWidthBuffer; }
     Camera* getCamera(Viewport viewPort) {
-        return cameras[viewPort];
+        return &(cameras[viewPort]);
     }
+    void setMouseMode(MouseMode mode) { mouseMode = mode; }
+    MouseMode getMouseMode() const { return mouseMode; }
+
 private:
     float windowWidth = Constants::SCR_WIDTH;
     float windowHeight = Constants::SCR_HEIGHT;
@@ -39,7 +49,8 @@ private:
     int borderWidthPixels = 2;
     int borderWidthBuffer = 2; // (Invisible) buffer to make the border easier to click
     std::unordered_map<Viewport, std::array<GLint, 4>> viewports;
-    std::unordered_map<Viewport, Camera*> cameras;
+    std::unordered_map<Viewport, Camera> cameras;
+    MouseMode mouseMode = MouseMode::NONE;
 };
 
 struct MouseCallbackContext {

@@ -5,7 +5,6 @@
 #include <iostream>
 #include <macros.h>
 #include "constants.h"
-#include "camera.h"
 #include "interpreter/turtle.h"
 #include "interpreter/interpreter.h"
 #include "interpreter/nodes/movenode.h"
@@ -29,9 +28,7 @@ int main() {
 
 		// GLFW initialization and global settings
 		GLFWwindow* window = OpenGLUtils::initializeGLFW();
-		Camera cameraLeft;
-		Camera cameraRight;
-		OpenGLUtils::SplitViewport splitViewport(window, &cameraLeft, &cameraRight);
+		OpenGLUtils::SplitViewport splitViewport(window);
 		GLFWcursor* resizeCursor = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
 		OpenGLUtils::MouseCallbackContext context{ &splitViewport, resizeCursor };
 		OpenGLUtils::bindMouseInputsToWindow(window, context);
@@ -59,11 +56,11 @@ int main() {
 			// Render left viewport
 			splitViewport.setViewport(OpenGLUtils::Viewport::LEFT);
 			turtle.drawGeometry(
-				cameraLeft.calcViewMatrix(),
+				splitViewport.getCamera(OpenGLUtils::Viewport::LEFT)->calcViewMatrix(),
 				glm::vec2(splitViewport.getViewportWidth(OpenGLUtils::Viewport::LEFT), splitViewport.getViewportHeight(OpenGLUtils::Viewport::LEFT)),
 				0.0f,
-				cameraLeft.getNearPlaneDims(),
-				cameraLeft.getNearPlane()
+				splitViewport.getCamera(OpenGLUtils::Viewport::LEFT)->getNearPlaneDims(),
+				splitViewport.getCamera(OpenGLUtils::Viewport::LEFT)->getNearPlane()
 			);
 
 			splitViewport.setViewport(OpenGLUtils::Viewport::RIGHT);
