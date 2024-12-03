@@ -21,7 +21,6 @@ void NodeEditor::init(GLFWwindow* window) {
     ImGui::CreateContext();
     ImNodes::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     ImGui::StyleColorsDark();
 
     // Setup Platform/Renderer bindings
@@ -190,7 +189,14 @@ void NodeEditor::show(
         ImNodes::Link(link.id, link.startPinId, link.endPinId);
     }
 
+    ImNodes::MiniMap();
     ImNodes::EndNodeEditor();
+
+    if( ImNodes::IsEditorHovered() && ImGui::GetIO().MouseWheel != 0 )
+    {
+        float zoom = ImNodes::EditorContextGetZoom() + ImGui::GetIO().MouseWheel * 0.1f;
+        ImNodes::EditorContextSetZoom( zoom, ImGui::GetMousePos() );
+    }
 
     for (int nodeId : nodesToDelete) {
         deleteNode(nodeId);
@@ -208,7 +214,7 @@ void NodeEditor::show(
 list<uPtr<Node>> NodeEditor::getNodeList() const {
     list<uPtr<Node>> nodes;
 
-    // This is pretty janky... a result a bad choice of data model, but it works as a proof of concept.
+    // This is pretty janky... a result of a bad choice of data model, but it works as a proof of concept.
     // A better data model would be a graph.
     int inLink = nodeIdMap.at(beginNodeId)->get()->getOutLinkId();
     while (inLink != -1) {
