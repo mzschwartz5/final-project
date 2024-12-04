@@ -2,8 +2,6 @@
 
 *A bespoke OpenGL application for creating 3D models via a node-based editor and L-system like commands that generate and blend SDFs.*
 
-![FinalResult](/img/final_result.webp)
-
 ![Bear Demo](/img/beardemo.gif)
 
 ![Demo](/img/demo.gif)
