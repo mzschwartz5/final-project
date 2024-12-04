@@ -168,3 +168,11 @@ Taking inspiration from a particular natural phenomenon or distinctive set of vi
 - You can also run "C/C++: Select a Configuration... > (Win32 | Mac)" to use Intellisense in VSCode.
 
 - Alternatively, run the executable directly: `./Spliced` (or `./Spliced.exe` on Windows)
+
+
+## Misc
+- Future direction: what do you guys think would make for good nodes?
+- Stateful turtle?
+- Process of creating a new node
+- Interpreter only works with one type: float. But that can be cast to int so it's good enough.
+- Future direction: jump statements and control flow

@@ -46,8 +46,8 @@ void Turtle::reset() {
 }
 
 void Turtle::rotate(float yaw, float pitch) {
-    this->yaw = yaw;
-    this->pitch = pitch;
+    this->yaw += yaw;
+    this->pitch += pitch;
 }
 
 void Turtle::move(float distance, const vec3& scale, bool draw) {
