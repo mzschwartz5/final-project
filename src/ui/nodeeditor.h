@@ -13,6 +13,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/unordered_map.hpp>
 #include <cereal/types/memory.hpp>
+#include <chrono>
 
 using std::list;
 using std::unordered_map;
@@ -34,9 +35,8 @@ struct Link {
 class NodeEditor {
 
 public:
-    NodeEditor();
+    NodeEditor(GLFWwindow* window, const string& fileNamePrefix = "");
     ~NodeEditor() = default;
-    void init(GLFWwindow* window);
     void reset();
     void teardown();
     void show(
@@ -65,12 +65,14 @@ private:
     bool shouldDeleteLink(int linkId);
     void deleteLink(int linkId);
 
-
     void saveNodeEditor();
-    void loadNodeEditor();
+    void loadNodeEditor(const string& fileNamePrefix);
 
+    string fileNamePrefix;
     int beginNodeId;
     bool createLinkWithNode = false;
+    std::chrono::time_point<std::chrono::steady_clock> lastSaveTime;
+    bool showSaveIndicator = false;
     int uniqueId = 0;
     bool dirty = true;
     unordered_map<int, uPtr<UINode>> nodeIdMap;

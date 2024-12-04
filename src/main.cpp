@@ -33,8 +33,7 @@ int main() {
 		Turtle turtle;
 		Interpreter interpreter(turtle);
 
-		NodeEditor nodeEditor;
-		nodeEditor.init(window);
+		NodeEditor nodeEditor(window, "testfile20241203230543");
 
 		// Main render loop
 		// Draw images until told to explicitly stop (e.g. x out of window)
