@@ -37,6 +37,7 @@ public:
     unsigned int getPositionIndex() const { return positionIndex; }
     void setPositionIndex(unsigned int index) { positionIndex = index; }
     const vec3& getScale() const { return scale; }
+    void setSampleDensity(int sampleDensity) { this->sampleDensity = sampleDensity; }
 
     void finalize();
     void reset();
@@ -51,11 +52,11 @@ public:
 
 private:
     static bool _instantiated;
-    static constexpr int METABALLS_PER_SEGMENT = 10;
     
     RaymarchingRenderer raymarchingRenderer;
     vec3 position = vec3(0.0f, 0.0f, 0.0f);
     vec3 scale = vec3(1.0f, 1.0f, 1.0f);
+    int sampleDensity = 10;
     float pitch = 0.0f; // radians
     float yaw = 0.0f;   // radians
     unsigned int positionIndex;

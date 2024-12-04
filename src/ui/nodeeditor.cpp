@@ -8,6 +8,7 @@
 #include "uipitchnode.h"
 #include "uistoretransformnode.h"
 #include "uirestoretransformnode.h"
+#include "uisampledensitynode.h"
 #include <fstream>
 #include <ctime>
 #include <iomanip>
@@ -71,7 +72,7 @@ void NodeEditor::handleMenuChanges(bool linkDropped) {
 
     if (ImGui::BeginPopup("Add Node"))
     {
-        // TODO: turn this into a for loop with a factor pattern to create the nodes
+        // TODO: turn this into a for loop with a factory pattern to create the nodes
         if (ImGui::MenuItem("Move")) {
             addNode(std::move(mkU<UIMoveNode>(getNewId(), getNewId(), getNewId())));
         }
@@ -86,6 +87,9 @@ void NodeEditor::handleMenuChanges(bool linkDropped) {
         }
         else if (ImGui::MenuItem("Store")) {
             addNode(std::move(mkU<UIStoreTransformNode>(getNewId(), getNewId(), getNewId())));
+        }
+        else if (ImGui::MenuItem("SampleDensityNode")) {
+            addNode(std::move(mkU<UISampleDensityNode>(getNewId(), getNewId(), getNewId())));
         }
         
         ImGui::EndPopup();

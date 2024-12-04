@@ -17,11 +17,12 @@ namespace MathUtils {
      * 
      * @return An array of N points linearly resampled between start and end
      */
-    template <typename T, std::size_t N>
-    std::array<T, N> linearResample(const T& start, const T& end) {
-        std::array<T, N> resampled;
-        for (int i = 0; i < N; i++) {
-            resampled[i] = start + (end - start) * static_cast<float>(i + 1) / static_cast<float>(N);
+    template <typename T>
+    vector<T> linearResample(const T& start, const T& end, int sampleDensity) {
+        vector<T> resampled;
+        for (int i = 0; i < sampleDensity; i++) {
+            T resampled_i = start + (end - start) * static_cast<float>(i + 1) / static_cast<float>(sampleDensity);
+            resampled.push_back(resampled_i);
         }
         return resampled;
     }
@@ -35,12 +36,13 @@ namespace MathUtils {
      * 
      * @return An array of N points resampled between start and end with a bias factor
      */
-    template <typename T, std::size_t N>
-    std::array<T, N> biasResample(const T& start, const T& end, float bias) {
+    template <typename T>
+    vector<T> biasResample(const T& start, const T& end, float bias, int sampleDensity) {
         assert(bias >= 0.0f && bias <= 1.0f);
-        std::array<T, N> resampled;
-        for (int i = 0; i < N; i++) {
-            resampled[i] = start + (end - start) * static_cast<float>(pow(static_cast<float>(i + 1) / static_cast<float>(N), log(bias)/log(0.5f)));
+        vector<T> resampled;
+        for (int i = 0; i < sampleDensity; i++) {
+            T resample_i = start + (end - start) * static_cast<float>(pow(static_cast<float>(i + 1) / static_cast<float>(sampleDensity), log(bias)/log(0.5f)));
+            resampled.push_back(resample_i);
         }
         return resampled;
 

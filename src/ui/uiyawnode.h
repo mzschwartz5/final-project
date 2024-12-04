@@ -13,7 +13,7 @@ public:
     ~UIYawNode() = default;
     list<uPtr<Node>> toInterpreterNodes() override {
         list<uPtr<Node>> nodes;
-        nodes.push_back(mkU<NumberNode>(glm::radians(yaw))); // 4 arguments for yaw node
+        nodes.push_back(mkU<NumberNode>(glm::radians(yaw))); 
         nodes.push_back(mkU<YawNode>());
         return nodes;
     }
