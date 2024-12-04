@@ -7,6 +7,7 @@
 
 class UIMoveNode : public UINode {
 public:
+    UIMoveNode() = default; // cereal needs a default constructor
     UIMoveNode(int id, int startPinId, int endPinId) : UINode("Move", id, startPinId, endPinId) {}
     ~UIMoveNode() = default;
 
@@ -22,30 +23,32 @@ public:
     }
     
     bool show() override {
+        UINode::startShow();
         UINode::show();
         bool dirty = false;
 
-        if (ImGui::SliderFloat("Distance", &distance, 0.01f, 10.0f)) {
-            dirty = true;
-        }
-
-        if (ImGui::SliderFloat("ScaleX", &scale[0], 0.01f, 5.0f)) {
-            dirty = true;
-        }
-
-        if (ImGui::SliderFloat("ScaleY", &scale[1], 0.01f, 5.0f)) {
-            dirty = true;
-        }
-
-        if (ImGui::SliderFloat("ScaleZ", &scale[2], 0.01f, 5.0f)) {
-            dirty = true;
-        }
-
+        dirty = ( 
+            ImGui::SliderFloat("Distance", &distance, 0.01f, 10.0f)
+            || ImGui::SliderFloat("ScaleX", &scale[0], 0.01f, 5.0f)
+            || ImGui::SliderFloat("ScaleY", &scale[1], 0.01f, 5.0f)
+            || ImGui::SliderFloat("ScaleZ", &scale[2], 0.01f, 5.0f)
+        );
+        
+        UINode::endShow();
         return dirty;
+    }
+    
+    template<class Archive>
+    void serialize(Archive & archive) {
+        archive(cereal::base_class<UINode>(this), distance, scale);
     }
 
 private:
     float distance = 0;
     float scale[3] = {1.0f, 1.0f, 1.0f};
 };
+
+CEREAL_REGISTER_TYPE (UIMoveNode)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(UINode, UIMoveNode)
+
 #endif

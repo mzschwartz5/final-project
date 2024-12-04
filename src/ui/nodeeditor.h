@@ -10,6 +10,10 @@
 #include <string>
 #include "uinode.h"
 #include "beginuinode.h"
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/memory.hpp>
+
 using std::list;
 using std::unordered_map;
 using std::string;
@@ -20,6 +24,11 @@ struct Link {
     int endPinId;
     int startNodeId;
     int endNodeId;
+
+    template <class Archive>
+    void serialize(Archive & ar) {
+        ar(id, startPinId, endPinId, startNodeId, endNodeId);
+    }
 };
 
 class NodeEditor {
@@ -39,23 +48,33 @@ public:
     list<uPtr<Node>> getNodeList() const;
     bool isDirty() { return dirty; }
     void setDirty(bool dirty) { this->dirty = dirty; }
+    
+    template <class Archive>
+    void serialize(Archive & ar) {
+        ar(uniqueId, beginNodeId, nodeIdMap, linkIdMap);
+    }
+
 
 private:
     int getNewId();
     void addNode(uPtr<UINode> node);
-    void handleMenuChanges();
+    void handleMenuChanges(bool linkDropped);
     bool shouldDeleteNode(int nodeId);
     void deleteNode(int nodeId);
     bool maybeAddLink();
     bool shouldDeleteLink(int linkId);
     void deleteLink(int linkId);
+
+
+    void saveNodeEditor();
+    void loadNodeEditor();
+
     int beginNodeId;
+    bool createLinkWithNode = false;
     int uniqueId = 0;
-    bool dirty = false;
-    list<uPtr<UINode>> nodeList;
-    list<Link> linkList;
-    unordered_map<int, list<uPtr<UINode>>::iterator> nodeIdMap;
-    unordered_map<int, list<Link>::iterator> linkIdMap;
+    bool dirty = true;
+    unordered_map<int, uPtr<UINode>> nodeIdMap;
+    unordered_map<int, Link> linkIdMap;
 };
 
 #endif

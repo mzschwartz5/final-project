@@ -8,11 +8,9 @@
 #include "uipitchnode.h"
 #include "uistoretransformnode.h"
 #include "uirestoretransformnode.h"
+#include <fstream>
 
 NodeEditor::NodeEditor() {
-    const auto& it = nodeList.insert(nodeList.end(), mkU<BeginUINode>(getNewId(), getNewId(), getNewId()));
-    beginNodeId = it->get()->getId();
-    nodeIdMap[beginNodeId] = it;
 }
 
 void NodeEditor::init(GLFWwindow* window) {
@@ -22,10 +20,18 @@ void NodeEditor::init(GLFWwindow* window) {
     ImNodes::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     ImGui::StyleColorsDark();
-
+    ImNodes::PushStyleVar(ImNodesStyleVar_PinHoverRadius, 10);
+    ImNodes::PushStyleVar(ImNodesStyleVar_PinCircleRadius, 5);
     // Setup Platform/Renderer bindings
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
+    loadNodeEditor();
+
+    // Create a beginNode if it doesn't exist (wasn't loaded in from file)
+    if (nodeIdMap.empty()) {
+        beginNodeId = getNewId();
+        nodeIdMap[beginNodeId] = std::move(mkU<BeginUINode>(beginNodeId, getNewId(), getNewId()));
+    }
 }
 
 void NodeEditor::reset() {
@@ -36,6 +42,7 @@ void NodeEditor::reset() {
 }
 
 void NodeEditor::teardown() {
+    saveNodeEditor();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImNodes::DestroyContext();
@@ -46,13 +53,14 @@ int NodeEditor::getNewId() {
     return uniqueId++;
 }
 
-void NodeEditor::handleMenuChanges() {
+void NodeEditor::handleMenuChanges(bool linkDropped) {
     const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
-                            ImNodes::IsEditorHovered() && ImGui::IsKeyReleased(ImGuiKey_A);
+                            ImNodes::IsEditorHovered() && (ImGui::IsKeyReleased(ImGuiKey_A) || linkDropped);
 
     if (!ImGui::IsAnyItemHovered() && open_popup)
     {
         ImGui::OpenPopup("Add Node");
+        if (linkDropped) createLinkWithNode = true;
     }
 
     if (ImGui::BeginPopup("Add Node"))
@@ -81,8 +89,7 @@ void NodeEditor::handleMenuChanges() {
 void NodeEditor::addNode(uPtr<UINode> node) {
     int nodeId = node->getId();
     ImNodes::SetNodeScreenSpacePos(nodeId, ImGui::GetMousePos());
-    auto it = nodeList.insert(nodeList.end(), std::move(node));
-    nodeIdMap[nodeId] = it;
+    nodeIdMap[nodeId] = std::move(node);
     dirty = true;
 }
 
@@ -90,11 +97,10 @@ bool NodeEditor::maybeAddLink() {
     Link link;
     if (ImNodes::IsLinkCreated(&link.startNodeId, &link.startPinId, &link.endNodeId, &link.endPinId)) {
         link.id = getNewId();
-        auto it = linkList.insert(linkList.end(), link);
-        linkIdMap[link.id] = it;
+        linkIdMap[link.id] = link;
 
-        nodeIdMap[link.startNodeId]->get()->setOutLinkId(link.id);
-        nodeIdMap[link.endNodeId]->get()->setInLinkId(link.id);
+        nodeIdMap[link.startNodeId]->setOutLinkId(link.id);
+        nodeIdMap[link.endNodeId]->setInLinkId(link.id);
 
         dirty = true;
         return true;
@@ -113,10 +119,9 @@ void NodeEditor::deleteLink(int linkId) {
     auto it = linkIdMap.find(linkId);
     if (it == linkIdMap.end()) return;
 
-    nodeIdMap[it->second->startNodeId]->get()->setOutLinkId(-1);
-    nodeIdMap[it->second->endNodeId]->get()->setInLinkId(-1);
+    nodeIdMap[it->second.startNodeId]->setOutLinkId(-1);
+    nodeIdMap[it->second.endNodeId]->setInLinkId(-1);
     
-    linkList.erase(it->second);
     linkIdMap.erase(linkId);
 
     dirty = true;
@@ -131,13 +136,13 @@ bool NodeEditor::shouldDeleteNode(int nodeId) {
 }
 
 void NodeEditor::deleteNode(int nodeId) {
-    auto it = nodeIdMap[nodeId];
+    auto it = nodeIdMap[nodeId].get();
 
     // Remove all links connected to this node
     std::vector<int> linksToDelete;
-    for (const Link& link : linkList) {
-        if (link.startPinId == it->get()->getEndPinId() || link.endPinId == it->get()->getStartPinId()) {
-            linksToDelete.push_back(link.id);
+    for (const auto& linkEntry : linkIdMap) {
+        if (linkEntry.second.startPinId == it->getEndPinId() || linkEntry.second.endPinId == it->getStartPinId()) {
+            linksToDelete.push_back(linkEntry.second.id);
         }
     }
 
@@ -145,7 +150,6 @@ void NodeEditor::deleteNode(int nodeId) {
         deleteLink(linkId);
     }
 
-    nodeList.erase(it);
     nodeIdMap.erase(nodeId);
 
     dirty = true;
@@ -160,28 +164,30 @@ void NodeEditor::show(
     // Set ImGui window pos and size to only overlay the right viewport
     ImGui::SetNextWindowPos(ImVec2(editorPosX, editorPosY));
     ImGui::SetNextWindowSize(ImVec2(editorWidth, editorHeight));
-    ImGui::Begin("Node editor", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse );
+    ImGui::Begin("Node editor", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
     maybeAddLink();
     
+    bool linkDropped = ImNodes::IsLinkDropped();
+
     ImNodes::BeginNodeEditor();
-    handleMenuChanges();
+    handleMenuChanges(linkDropped);
 
     std::vector<int> nodesToDelete;
     std::vector<int> linksToDelete;
 
-    for (const auto& node : nodeList) {
+    for (const auto& nodeEntry : nodeIdMap) {
+        auto node = nodeEntry.second.get();
         if (shouldDeleteNode(node->getId())) {
             nodesToDelete.push_back(node->getId());
             continue;
         }
 
-        ImNodes::BeginNode(node->getId());
         if (node->show()) dirty = true;
-        ImNodes::EndNode();
     }
 
-    for (const Link& link : linkList) {
+    for (const auto& linkEntry : linkIdMap) {
+        const auto& link = linkEntry.second;
         if (shouldDeleteLink(link.id)) {
             linksToDelete.push_back(link.id);
             continue;
@@ -189,7 +195,7 @@ void NodeEditor::show(
         ImNodes::Link(link.id, link.startPinId, link.endPinId);
     }
 
-    ImNodes::MiniMap();
+    ImNodes::MiniMap(0.2f, ImNodesMiniMapLocation_TopRight);
     ImNodes::EndNodeEditor();
 
     if( ImNodes::IsEditorHovered() && ImGui::GetIO().MouseWheel != 0 )
@@ -216,20 +222,37 @@ list<uPtr<Node>> NodeEditor::getNodeList() const {
 
     // This is pretty janky... a result of a bad choice of data model, but it works as a proof of concept.
     // A better data model would be a graph.
-    int inLink = nodeIdMap.at(beginNodeId)->get()->getOutLinkId();
+    int inLink = nodeIdMap.at(beginNodeId)->getOutLinkId();
     while (inLink != -1) {
         auto it = linkIdMap.find(inLink);
         if (it == linkIdMap.end()) break;
 
-        int nodeId = it->second->endNodeId;
+        int nodeId = it->second.endNodeId;
         auto nodeIt = nodeIdMap.find(nodeId);
         if (nodeIt == nodeIdMap.end()) break;
 
-        list<uPtr<Node>> interpreterNodes = nodeIt->second->get()->toInterpreterNodes();
+        list<uPtr<Node>> interpreterNodes = nodeIt->second->toInterpreterNodes();
         nodes.splice(nodes.end(), interpreterNodes);
 
-        inLink = nodeIt->second->get()->getOutLinkId();
+        inLink = nodeIt->second->getOutLinkId();
     }
 
     return nodes;
+}
+
+void NodeEditor::saveNodeEditor() {
+    ImNodes::SaveCurrentEditorStateToIniFile("nodeeditor.ini");
+
+    std::ofstream os("out.cereal", std::ios::binary);
+    cereal::BinaryOutputArchive archive( os );
+    archive(*this);
+}
+
+void NodeEditor::loadNodeEditor() {
+    ImNodes::LoadCurrentEditorStateFromIniFile("nodeeditor.ini");
+    std::ifstream is("out.cereal", std::ios::binary);
+    if (!is.good()) return;
+
+    cereal::BinaryInputArchive archive( is );
+    archive(*this);
 }

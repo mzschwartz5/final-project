@@ -8,6 +8,7 @@
 
 class UIYawNode : public UINode {
 public:
+    UIYawNode() = default; // cereal needs a default constructor
     UIYawNode(int id, int startPinId, int endPinId) : UINode("Yaw", id, startPinId, endPinId) {}
     ~UIYawNode() = default;
     list<uPtr<Node>> toInterpreterNodes() override {
@@ -17,6 +18,7 @@ public:
         return nodes;
     }
     bool show() override {
+        UINode::startShow();
         UINode::show();
         bool dirty = false;
 
@@ -24,10 +26,20 @@ public:
             dirty = true;
         }
 
+        UINode::endShow();
         return dirty;
+    }
+
+    template<class Archive>
+    void serialize(Archive & archive) {
+        archive(cereal::base_class<UINode>(this), yaw);
     }
 
 private:
     float yaw = 0;
 };
+
+CEREAL_REGISTER_TYPE (UIYawNode)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(UINode, UIYawNode)
+
 #endif

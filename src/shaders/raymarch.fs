@@ -29,7 +29,7 @@ const int MAX_STEPS = 100;
 const float MAX_STEP_SIZE = 1.0f;
 const float MIN_STEP_SIZE = 0.05f;
 const float EPISILON = 0.001f;
-const float K = 0.1f;
+const float K = 0.3f;
 
 // Ellipsoid SDF: https://www.shadertoy.com/view/tdS3DG
 float evaluateMetaballField(vec3 point, vec3 center, vec3 scale, float radius) {

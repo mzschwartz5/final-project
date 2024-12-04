@@ -5,11 +5,15 @@
 #include "../interpreter/nodes/node.h"
 #include "imnodes.h"
 #include "imgui.h"
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/types/string.hpp>
 using std::string;
 
 class UINode {
 
 public:
+    UINode() = default; // cereal needs a default constructor
     UINode(const string& name, int id, int startPinId, int endPinId) :
         name(name), id(id), startPinId(startPinId), endPinId(endPinId) {}
     
@@ -24,16 +28,33 @@ public:
     string getName() const { return name; }
     virtual list<uPtr<Node>> toInterpreterNodes() = 0;
     virtual bool show() {
+
         ImNodes::BeginNodeTitleBar();
         ImGui::Text("%s", name.c_str());
         ImNodes::EndNodeTitleBar();
+        
         ImNodes::BeginInputAttribute(startPinId);
-        ImGui::Text("in");
         ImNodes::EndInputAttribute();
+        
         ImNodes::BeginOutputAttribute(endPinId);
-        ImGui::Text("out");
         ImNodes::EndOutputAttribute();
+        
         return false;
+    }
+
+    void startShow() {
+        ImGui::PushItemWidth(nodeWidth);
+        ImNodes::BeginNode(id);
+    }
+
+    void endShow() {
+        ImNodes::EndNode();
+        ImGui::PopItemWidth();
+    }
+    
+    template <class Archive>
+    void serialize(Archive & ar) {
+        ar(name, id, startPinId, endPinId, inLinkId, outLinkId, nodeWidth);
     }
 
 protected:
@@ -43,6 +64,7 @@ protected:
     int endPinId;
     int inLinkId = -1;
     int outLinkId = -1;
+    int nodeWidth = 80;
 };
 
 #endif // UINODE_H

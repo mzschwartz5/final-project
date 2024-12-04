@@ -6,6 +6,7 @@
 
 class UIRestoreTransformNode : public UINode {
 public:
+    UIRestoreTransformNode() = default; // cereal needs a default constructor
     UIRestoreTransformNode(int id, int startPinId, int endPinId) : UINode("Restore Transform", id, startPinId, endPinId) {}
     ~UIRestoreTransformNode() = default;
     
@@ -16,10 +17,20 @@ public:
     }
 
     bool show() override {
+        UINode::startShow();
         UINode::show();
+        UINode::endShow();
         return false;
     }
 
+    template<class Archive>
+    void serialize(Archive & archive) {
+        archive(cereal::base_class<UINode>(this));
+    }
+
 };
+
+CEREAL_REGISTER_TYPE (UIRestoreTransformNode)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(UINode, UIRestoreTransformNode)
 
 #endif // UIRESTORETRANSFORMNODE_H

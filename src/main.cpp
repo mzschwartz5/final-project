@@ -16,7 +16,6 @@
 #include "openglutils.h"
 #include "cube.h"
 #include "ui/nodeeditor.h"
-#include "imnodes.h"
 
 int main() {
     // Top level error handling

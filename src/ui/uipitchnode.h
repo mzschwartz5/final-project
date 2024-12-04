@@ -8,6 +8,7 @@
 
 class UIPitchNode : public UINode {
 public:
+    UIPitchNode() = default; // cereal needs a default constructor
     UIPitchNode(int id, int startPinId, int endPinId) : UINode("Pitch", id, startPinId, endPinId) {}
     ~UIPitchNode() = default;
     list<uPtr<Node>> toInterpreterNodes() override {
@@ -17,6 +18,7 @@ public:
         return nodes;
     }
     bool show() override {
+        UINode::startShow();
         UINode::show();
         bool dirty = false;
 
@@ -24,10 +26,20 @@ public:
             dirty = true;
         }
 
+        UINode::endShow();
         return dirty;
+    }
+
+    template<class Archive>
+    void serialize(Archive & archive) {
+        archive(cereal::base_class<UINode>(this), pitch);
     }
 
 private:
     float pitch = 0;
 };
+
+CEREAL_REGISTER_TYPE (UIPitchNode)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(UINode, UIPitchNode)
+
 #endif

@@ -69,11 +69,16 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/imgui/imgui.h")
     message(FATAL_ERROR "The IMGUI submodule was not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/external/cereal/include/cereal/cereal.hpp")
+    message(FATAL_ERROR "The cereal submodule was not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+endif()
+
 # Include directories for header files
 target_include_directories(Spliced PRIVATE ${CMAKE_SOURCE_DIR}/src
                                             ${CMAKE_SOURCE_DIR}/external/glm
                                             ${CMAKE_SOURCE_DIR}/external/stb
                                             ${CMAKE_SOURCE_DIR}/external/imgui
+                                            ${CMAKE_SOURCE_DIR}/external/cereal/include/
                                             ${CMAKE_SOURCE_DIR}/external/imgui/backends
                                             ${CMAKE_SOURCE_DIR}/includes/imnodes
                                             # Glad builds its include folder to the build directory
