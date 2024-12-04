@@ -87,8 +87,9 @@ void Turtle::setState(const vec3& newPos, const vec3& newScale, bool draw) {
     vector<vec3> resampledPositions 
         = MathUtils::linearResample<vec3>(position, newPos, sampleDensity);
 
+    // Can set bias to 0.5f for a linear resample
     vector<vec3> resampledScales
-        = MathUtils::linearResample<vec3>(scale, newScale, sampleDensity);
+        = MathUtils::biasResample<vec3>(scale, newScale, sampleDensity, sampleBias);
 
     for (int i = 0; i < sampleDensity; i++) {
         metaballs.emplace_back(Metaball{ resampledPositions[i], vec3(resampledScales[i]), 0.1f });

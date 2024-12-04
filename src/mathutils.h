@@ -37,7 +37,7 @@ namespace MathUtils {
      * @return An array of N points resampled between start and end with a bias factor
      */
     template <typename T>
-    vector<T> biasResample(const T& start, const T& end, float bias, int sampleDensity) {
+    vector<T> biasResample(const T& start, const T& end, int sampleDensity, float bias) {
         assert(bias >= 0.0f && bias <= 1.0f);
         vector<T> resampled;
         for (int i = 0; i < sampleDensity; i++) {

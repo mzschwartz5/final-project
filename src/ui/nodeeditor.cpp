@@ -9,6 +9,7 @@
 #include "uistoretransformnode.h"
 #include "uirestoretransformnode.h"
 #include "uisampledensitynode.h"
+#include "uisamplebiasnode.h"
 #include <fstream>
 #include <ctime>
 #include <iomanip>
@@ -90,6 +91,9 @@ void NodeEditor::handleMenuChanges(bool linkDropped) {
         }
         else if (ImGui::MenuItem("SampleDensityNode")) {
             addNode(std::move(mkU<UISampleDensityNode>(getNewId(), getNewId(), getNewId())));
+        }
+        else if (ImGui::MenuItem("SampleBiasNode")) {
+            addNode(std::move(mkU<UISampleBiasNode>(getNewId(), getNewId(), getNewId())));
         }
         
         ImGui::EndPopup();

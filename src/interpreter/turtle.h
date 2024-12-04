@@ -38,6 +38,7 @@ public:
     void setPositionIndex(unsigned int index) { positionIndex = index; }
     const vec3& getScale() const { return scale; }
     void setSampleDensity(int sampleDensity) { this->sampleDensity = sampleDensity; }
+    void setSampleBias(float sampleBias) { this->sampleBias = sampleBias; }
 
     void finalize();
     void reset();
@@ -57,6 +58,7 @@ private:
     vec3 position = vec3(0.0f, 0.0f, 0.0f);
     vec3 scale = vec3(1.0f, 1.0f, 1.0f);
     int sampleDensity = 10;
+    float sampleBias = 0.5f;
     float pitch = 0.0f; // radians
     float yaw = 0.0f;   // radians
     unsigned int positionIndex;
