@@ -1,5 +1,7 @@
 # Node based SDF Character Modeler
 
+*A bespoke OpenGL application for creating 3D models via a node-based editor and L-system like commands that generate and blend SDFs.*
+
 ![FinalResult](/img/final_result.webp)
 
 # Introduction
@@ -42,15 +44,110 @@ Before discussing the processs of creating this tool and the techniques involved
 
 ![Flowchart design](/img/FlowChart2(1).svg)
 
-(Not included: my initial attempts to integrate this as a blender plugin and use their API to generate geometry. Also: forays into marching cubes to generate a polygonal mesh out of SDFs)
+(Not included: my initial attempts to integrate this as a blender plugin and use the blender python API to generate geometry. Also: forays into marching cubes to generate a polygonal mesh out of SDFs)
+
+# SDFs
+
+SDFs, or Signed distance fields, are simply functions which return the distance to a surface (in 3D), given some point in space. The simplest SDF is likely the sphere, whose function is simply:
+
+```GLSL
+float sphereSDF(in vec3 point, in vec4 sphere) {
+    return length(point - sphere.xyz) - sphere.w; // where sphere.w is the radius
+}
+```
+
+That one-line function tells us how close we are to the sphere. When it returns 0, we know we're at its surface. This property rather useful for a technique called raymarching, where we "shoot" rays out from a virtual camera towards objects in our scene, marching along each ray until we hit something, and then draw what we hit. SDFs can tell us whether a ray "hit" an object, and, if we miss, can tell us how big our next step along the ray should be to quickly converge on our sphere.
+
+But perhaps the more useful property of SDFs, for the purposes of this project, is that two or more can be blended together simply by taking the minima of their values:
+
+```GLSL
+float blendedSDF = min(sdfA, sdfB);
+```
+
+And for a smooth blend between two or more SDFs, you can offset the minimum by a quadratic function:
+
+```GLSL
+float smoothMin( float sdfA, float sdfB, float k )
+{
+    k *= 4.0;
+    float h = max( k - abs(sdfA - sdfB), 0.0 ) / k;
+    return min(sdfA, sdfB) - h * h * k * (1.0 / 4.0);
+}
+```
+
+For a lot more information on smooth minima and SDFs, see Inigo Quilez's work [here](https://iquilezles.org/articles/).
+
+For this project however, it suffices to say that we can create smooth joins in our geometry as our turtle marches along by blending successive SDFs via a quadratic smooth minimum. It comes with a major downside, however: changes are not local. Any time new geometry is added, all previous geometry can be affected, sometimes strongly. Even simply putting two identical SDFs in the same location yields unintuitive results, when blended: instead of simply obscuring each other, the two SDFs will actually grow in size. It makes modeling quite unwieldy. As I discuss in the future directions section below, there are certainly methods for avoiding this (such as spatial partitioning), and methods that don't involve SDFs at all, but these were out of scope of my project.
+
+Lastly, I actually used SDF ellipsoids rather than spheres because ellipsoids have three radii which I used as multi-directional "scale" quantities as the turtle marches along.
+
+# Raymarching vs. Marching cubes (and others)
+
+I discussed briefly how raymarching works. But now I want to discuss the pros and cons of raymarching when compared with other methods like marching cubes.
+
+Pros:
+- Relatively easy to implement
+- Inherently parallel
+- Yields high visual fidelity results
+
+Cons:
+- Doesn't actually generate a mesh, just shades pixels.
+- Similarly, once the process is done, you can't actually do anything with the results before they're rendered.
+- Has to run every frame
+
+I went with ray marching largely for pros #1, #2, and #4. But initially, I started out with another method: marching cubes. This algorithm (famously the most cited paper in graphics) takes a scalar field and turns it into a mesh. It does so by evaluating each vertex of each cube in a grid and drawing triangles between the cube's edges depending on which vertices are above or below a so-called "isolevel" of the scalar field.
+
+So, since SDFs, as implicit surfaces, can be thought of as scalar fields, marching cubes can be used to turn them into triangular meshes and render those triangles! These are my pros and cons for marching cubes:
+
+Pros:
+- Simple algorithm, easy to implement on the CPU.
+- Run once (or any time SDFs change), then simply render the triangles every frame.
+- Produces a mesh!
+
+Cons:
+- Low resolution results, some artifacts; higher resolution requires a lot more computation.
+- Somewhat difficult to parallelize (lots of research here)
+
+In terms of the point about visual fidelity, just take a look at this SDF sphere pair rendered via marching cubes:
+
+![SDFs rendered via marching cubes](/img/HelloMetaballs.png)
+
+And that actually took my poor computer a good 10-15 seconds to generate the mesh (admittedly, with a very naive MC implementation with high vertex duplication).
+
+Nonetheless, I do actually think that marching cubes (or derivatives thereof, such as dual contouring) may prove the optimal way to proceed in the future of this project, for the reasons stated in the pros above. Most notably, to do anything interesting with procedural characters, such as skinning, rigging, and animating them, you have to have a mesh! But perhaps raymarching could still be used for high fidelity previews during editing, before baking into a mesh!
+
+# Bytecode interpreter
+
+Lastly, I'd like to talk a little bit about this "bytecode interpreter" (see the attributions below for my reference on this). I think Bob Nystrom really says it best with his tagline: *"Give behavior the flexibility of data by encoding it as instructions for a virtual machine."* It's a pattern used to give sandboxed control to the user over your application, by giving them a series of commands they can issue to your system, each of which affects some piece of the system's state. There are two keys here:
+
+1. You, the developer, get to decide which pieces of state the user can control.
+2. The user can influence the application state without having to write any code.
+
+Now, that second one isn't too special on its own: we influence application all the time without code by clicking and using key inputs. What makes this pattern special is that, by encoding commands as data (at its simplest, integers), we can easily save, load, modify, and share how we influenced the application.
+
+Putting this into the context of my SDF application:
+
+The node system is a set of commands. The turtle is the interpreter, processing each node and setting state accordingly (the turtle's position, its orientation, the scale for the SDFs, etc.) By using this pattern, its trivial to save a 3D model; simply save the command nodes to a file, and when you reload them the next time you open the application (or if you send it to someone else), just reinterpret the nodes to regenerate the model. It's lightweight, fast, and easily extensible; want to implement a new feature? Just create a new node and have it interact with the turtle's state as needed.
+
+## Node types
+
+A list of node types currently implemented:
+- Move - repositions the turtle (and the node that actually draws geometry!).
+- Yaw - rotate the turtle in the yaw axis.
+- Pitch - rotate the turtle in the pitch axis.
+- Scale - scale the shape of the SDFs drawn in the XYZ directions.
+- Store - save the transform of the turtle.
+- Restore - set the turtle's transform back to the last stored transform (without drawing).
+- SampleDensity - controls how many SDFs to place down between two points when the turtle moves.
+- SampleBias - controls how attributes (scale) change along a path segment of the turtle. E.g. if the bias is 0.5, scale will change linearly from the turtle's starting position to end position.
 
 ## Future direction
+- More SDF shapes!
 - Spatial hierarchy for SDF blending so only affect each other locally. Perhaps even along direction of turtle / only neighboring joints can blend.
 - Or abandon SDFs all together and use marching cubes with "paint brush" style (or terrain editor style) scalar field filling.
 - More node types, possibly with control flow logic and more procedural options (noise, functions, time, color, bezier curves etc.)
 - Meshify, skin, and rig the model.
 - Lastly, and most importantly, many more UI and UX improvements... as a user of my own tool, boy does it suck to work with!
-
 
 ## Build and run
 Note: changes to the project have made it incompatible with MacOS (which does not support SSBOs in OpenGL). The project can still be built and run in Windows by following the steps below.
@@ -65,6 +162,19 @@ Note: changes to the project have made it incompatible with MacOS (which does no
 - You can also run "C/C++: Select a Configuration... > (Win32 | Mac)" to use Intellisense in VSCode.
 
 - Alternatively, run the executable directly: `./Spliced` (or `./Spliced.exe` on Windows)
+
+## Bloopers
+
+A few moments that tickled me, I hope you also find some joy from them!
+
+![Bear monstrosity](/img/blooper.png)
+
+<p align="center"><i>The bear shown in the title image with the k-value (SDF blend thickness turned down), oh bother! </i></p>
+
+
+And a stack overflow that occurred *within* my bytecode interpreter... I have no one to blame but myself for this error!
+
+![Stack overflow!](/img/StackOverflow.png)
 
 ## Attributions:
 
