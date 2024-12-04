@@ -4,6 +4,10 @@
 
 ![FinalResult](/img/final_result.webp)
 
+![Bear Demo](/img/beardemo.gif)
+
+![Demo](/img/demo.gif)
+
 # Introduction
 
 This project started with a vision for game where players create and modify procedural characters as necessary to solve various puzzles. There are a handful of ways to create procedural organisms; famously, L-systems are used to generate procedural plants. And one could craft a system to generate a *particular type* of organism (say a fish) with varying attributes (scale density, body shape, etc). To be able to generate *any* type of organism, on the other hand... that necessitates giving the user a high degree of control over the modeling process. However, as you give the user more and more control, you end up with a 3D modeling application like Blender, Maya, or ZBrush; powerful tools, but not games by most definitions, and too complex for the average user.
