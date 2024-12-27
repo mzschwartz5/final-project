@@ -27,7 +27,7 @@ But what if, instead of lines, the turtle drew "tubes" behind it as it moved? An
 
 ## Limitations and caveats
 
-The proposed method, so far, only allows for additive geometry. Subtractive *is* possible with SDFs, but not implemented in this project. Additionally, as you may have noticed (especially in the title image of the bear), the models created via this method are rather smooth and blobby. This is a result of a smoothing function applied between successive turtle steps among all SDF components. It is simultaneously one of the greatest pros and mischevious cons of the method
+The proposed method, so far, only allows for additive geometry. Subtractive *is* possible with SDFs, but not implemented in this project. Additionally, as you may have noticed (especially in the title image of the bear), the models created via this method are rather smooth and blobby. This is a result of a smoothing function applied between successive turtle steps among all SDF components. It is simultaneously one of the greatest pros and most mischevious cons of the method.
 
 # Features / Components
 
@@ -58,7 +58,7 @@ float sphereSDF(in vec3 point, in vec4 sphere) {
 }
 ```
 
-That one-line function tells us how close we are to the sphere. When it returns 0, we know we're at its surface. This property rather useful for a technique called raymarching, where we "shoot" rays out from a virtual camera towards objects in our scene, marching along each ray until we hit something, and then draw what we hit. SDFs can tell us whether a ray "hit" an object, and, if we miss, can tell us how big our next step along the ray should be to quickly converge on our sphere.
+That one-line function tells us how close we are to the sphere. When it returns 0, we know we're at its surface. This property is rather useful for a technique called raymarching, where we "shoot" rays out from a virtual camera towards objects in our scene, marching along each ray until we hit something, and then draw what we hit. SDFs can tell us whether a ray "hit" an object, or, if we miss, can tell us how big our next step along the ray should be to quickly converge on our sphere.
 
 But perhaps the more useful property of SDFs, for the purposes of this project, is that two or more can be blended together simply by taking the minima of their values:
 
@@ -88,14 +88,14 @@ Lastly, I actually used SDF ellipsoids rather than spheres because ellipsoids ha
 I discussed briefly how raymarching works. But now I want to discuss the pros and cons of raymarching when compared with other methods like marching cubes.
 
 Pros:
-- Relatively easy to implement
-- Inherently parallel
-- Yields high visual fidelity results
+- Relatively easy to implement.
+- Inherently parallel.
+- Yields high visual fidelity results.
 
 Cons:
 - Doesn't actually generate a mesh, just shades pixels.
 - Similarly, once the process is done, you can't actually do anything with the results before they're rendered.
-- Has to run every frame
+- Has to run every frame.
 
 I went with ray marching largely for pros #1, #2, and #4. But initially, I started out with another method: marching cubes. This algorithm (famously the most cited paper in graphics) takes a scalar field and turns it into a mesh. It does so by evaluating each vertex of each cube in a grid and drawing triangles between the cube's edges depending on which vertices are above or below a so-called "isolevel" of the scalar field.
 
@@ -116,7 +116,7 @@ In terms of the point about visual fidelity, just take a look at this SDF sphere
 
 And that actually took my poor computer a good 10-15 seconds to generate the mesh (admittedly, with a very naive MC implementation with high vertex duplication).
 
-Nonetheless, I do actually think that marching cubes (or derivatives thereof, such as dual contouring) may prove the optimal way to proceed in the future of this project, for the reasons stated in the pros above. Most notably, to do anything interesting with procedural characters, such as skinning, rigging, and animating them, you have to have a mesh! But perhaps raymarching could still be used for high fidelity previews during editing, before baking into a mesh!
+Nonetheless, I do actually think that marching cubes (or derivatives thereof, such as dual contouring) may prove the optimal way to proceed in the future of this project, for the reasons stated in the pros above. Most notably, to do anything interesting with procedural characters, such as skinning, rigging, and animating them, you have to have a mesh! But perhaps raymarching could still be used for high fidelity previews during editing, before baking into a mesh.
 
 # Bytecode interpreter
 
